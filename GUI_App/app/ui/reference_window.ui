@@ -1,0 +1,2819 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ReferenceWindow</class>
+ <widget class="QMainWindow" name="ReferenceWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1665</width>
+    <height>960</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>STM32 Edge Vision — Dashboard</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="rootLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="topTabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabDashboard">
+       <attribute name="title">
+        <string>Dashboard</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="dashLayout" stretch="0,0">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="dashLeftLayout" stretch="0,0,0">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QGroupBox" name="imageGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>320</width>
+              <height>280</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>640</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Camera Preview</string>
+            </property>
+            <layout class="QVBoxLayout" name="imageGroupLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="previewToolbarLayout">
+               <item>
+                <widget class="QLabel" name="previewHintLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Live preview  ·  STM32 result is authoritative</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>hint</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnSaveFrame">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Save the current raw frame as PNG</string>
+                 </property>
+                 <property name="text">
+                  <string>Save Frame…</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QFrame" name="frame">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Shape::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Plain</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="imageLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <horstretch>1</horstretch>
+                    <verstretch>1</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>320</width>
+                    <height>240</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>No frame yet — connect STM32 and press SNAP</string>
+                  </property>
+                  <property name="textFormat">
+                   <enum>Qt::TextFormat::PlainText</enum>
+                  </property>
+                  <property name="scaledContents">
+                   <bool>false</bool>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="imageInfoLayout">
+               <property name="spacing">
+                <number>7</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="imgFormatLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Format: —</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>value</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="imgSizeLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Size: —</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>value</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="imageInfoSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="frameInfoLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Frame: —</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>hint</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          
+          <item>
+           <widget class="QGroupBox" name="camQualityGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+              <horstretch>0</horstretch><verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title"><string>Image Quality Settings</string></property>
+            <layout class="QGridLayout" name="camQualityGrid" columnstretch="0,1">
+             <property name="horizontalSpacing"><number>8</number></property>
+             <property name="verticalSpacing"><number>5</number></property>
+
+             <item row="0" column="0"><widget class="QLabel" name="briLabel"><property name="text"><string>Brightness</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="briComboBox">
+               <property name="currentIndex"><number>2</number></property><property name="toolTip"><string>BRI — sent immediately on change</string></property>
+               <item><property name="text"><string>-2</string></property></item>
+               <item><property name="text"><string>-1</string></property></item>
+               <item><property name="text"><string>0</string></property></item>
+               <item><property name="text"><string>+1</string></property></item>
+               <item><property name="text"><string>+2</string></property></item>
+              </widget>
+             </item>
+
+             <item row="1" column="0"><widget class="QLabel" name="conQLabel"><property name="text"><string>Contrast</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="conComboBox">
+               <property name="currentIndex"><number>2</number></property><property name="toolTip"><string>CON — sent immediately on change</string></property>
+               <item><property name="text"><string>-2</string></property></item>
+               <item><property name="text"><string>-1</string></property></item>
+               <item><property name="text"><string>0</string></property></item>
+               <item><property name="text"><string>+1</string></property></item>
+               <item><property name="text"><string>+2</string></property></item>
+              </widget>
+             </item>
+
+             <item row="2" column="0"><widget class="QLabel" name="satLabel"><property name="text"><string>Saturation</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="satComboBox">
+               <property name="currentIndex"><number>2</number></property><property name="toolTip"><string>SAT — sent immediately on change</string></property>
+               <item><property name="text"><string>-2</string></property></item>
+               <item><property name="text"><string>-1</string></property></item>
+               <item><property name="text"><string>0</string></property></item>
+               <item><property name="text"><string>+1</string></property></item>
+               <item><property name="text"><string>+2</string></property></item>
+              </widget>
+             </item>
+
+             <item row="3" column="0"><widget class="QLabel" name="effectLabel"><property name="text"><string>Effect</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="effectComboBox"><property name="toolTip"><string>EFFECT — sent immediately on change</string></property>
+               <item><property name="text"><string>NORMAL</string></property></item>
+               <item><property name="text"><string>BW</string></property></item>
+               <item><property name="text"><string>NEGATIVE</string></property></item>
+               <item><property name="text"><string>NEGATIVE_BW</string></property></item>
+               <item><property name="text"><string>BLUISH</string></property></item>
+               <item><property name="text"><string>GREENISH</string></property></item>
+               <item><property name="text"><string>REDDISH</string></property></item>
+               <item><property name="text"><string>ANTIQUE</string></property></item>
+              </widget>
+             </item>
+
+             <item row="4" column="0"><widget class="QLabel" name="lightLabel"><property name="text"><string>Light Mode</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="4" column="1">
+              <widget class="QComboBox" name="lightComboBox"><property name="toolTip"><string>LIGHT — sent immediately on change</string></property>
+               <item><property name="text"><string>AUTO</string></property></item>
+               <item><property name="text"><string>SUNNY</string></property></item>
+               <item><property name="text"><string>CLOUDY</string></property></item>
+               <item><property name="text"><string>OFFICE</string></property></item>
+               <item><property name="text"><string>HOME</string></property></item>
+              </widget>
+             </item>
+
+             <item row="5" column="0"><widget class="QLabel" name="awbLabel"><property name="text"><string>AWB</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+             <item row="5" column="1">
+              <widget class="QComboBox" name="awbComboBox"><property name="toolTip"><string>AWB — sent immediately on change</string></property>
+               <item><property name="text"><string>ON (1)</string></property></item>
+               <item><property name="text"><string>OFF (0)</string></property></item>
+              </widget>
+             </item>
+
+             <item row="6" column="0" colspan="2">
+              <layout class="QHBoxLayout">
+               <item>
+                <widget class="QPushButton" name="btnResetQuality">
+                 <property name="text"><string>Reset Defaults</string></property>
+                </widget>
+               </item>
+               <item><spacer><property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>0</height></size></property></spacer></item>
+               <item>
+                <widget class="QPushButton" name="btnApplyAllQuality">
+                 <property name="text"><string>Apply All</string></property>
+                 <property name="toolTip"><string>Re-send all quality settings to STM32</string></property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="quickResultGroupBox">
+            <property name="title">
+             <string>Last Result Summary</string>
+            </property>
+            <layout class="QHBoxLayout" name="quickResultLayout">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="cvCountKeyLabel">
+               <property name="text">
+                <string>CV Objects</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvCountValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvTimeKeyLabel">
+               <property name="text">
+                <string>CV Time</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvTimeValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvBrightKeyLabel">
+               <property name="text">
+                <string>Brightness</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvBrightValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvBoxesKeyLabel">
+               <property name="text">
+                <string>Boxes</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cvBoxesValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="mlPredKeyLabel">
+               <property name="text">
+                <string>ML Class</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="mlPredValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="mlConfKeyLabel">
+               <property name="text">
+                <string>Conf</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="mlConfValueLabel">
+               <property name="text">
+                <string>—</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="dashRightLayout" stretch="0,0,0,0">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QGroupBox" name="serialGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Serial Connection</string>
+            </property>
+            <layout class="QVBoxLayout" name="serialGroupLayout">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="serialRowLayout" stretch="0,0,0,0,0,0">
+               <item>
+                <widget class="QLabel" name="portLabel">
+                 <property name="text">
+                  <string>Port</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="portComboBox"/>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnRefreshPorts">
+                 <property name="maximumSize">
+                  <size>
+                   <width>80</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>↺</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="baudrateLabel">
+                 <property name="text">
+                  <string>Baud</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="baudrateComboBox">
+                 <item>
+                  <property name="text">
+                   <string>115200</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>230400</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>460800</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>921600</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2000000</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>3750000</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnConnect">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Connect</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="connStatusLabel">
+               <property name="text">
+                <string>● Disconnected</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="manualUartLayout" stretch="0,0,0,0,0">
+               <item>
+                <widget class="QLabel" name="manualUartLabel">
+                 <property name="text">
+                  <string>Command</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="manualCommandLineEdit">
+                 <property name="placeholderText">
+                  <string>e.g. GET_STATUS</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="commandPresetComboBox">
+                 <property name="toolTip">
+                  <string>Select a valid STM32 firmware command</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>GET_STATUS</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>SNAP</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>STREAM 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>STREAM 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>MODE JPEG</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>MODE RGB</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES QQVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES QVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES WQVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES VGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES SVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES XGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RES SXGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>FLASH 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>FLASH 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>AWB 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>AWB 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>BRI 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CON 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>SAT 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>EFFECT NORMAL</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>EFFECT BW</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>EFFECT NEGATIVE</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LIGHT AUTO</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LIGHT SUNNY</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LIGHT CLOUDY</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LIGHT OFFICE</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LIGHT HOME</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV GET</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV RUN</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV EN 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV EN 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV PRESET 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV PRESET 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV PRESET 2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV PRESET 3</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BGCAP</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BGSUB 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BGSUB 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BORDFILT 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BORDFILT 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV THRMODE 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV THRMODE 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV THR 128</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV INV 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV INV 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV FILTER 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV FILTER 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV FILTER 2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BLUR 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BLUR 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV BLUR 2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPHMODE 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPHMODE 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPHMODE 2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPH 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPH 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MORPH 2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV CON 4</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV CON 8</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MINAREA 20</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV MAXAREA 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV ASPECT 0 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV CIRC 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>CV ROI 0</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>TM GET</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>TM RUN</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>TM EN 1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>TM EN 0</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               
+               <item>
+                <widget class="QPushButton" name="btnSendManual">
+                 <property name="maximumSize">
+                  <size>
+                   <width>96</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Send</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+            <item>
+             <widget class="QGroupBox" name="quickCamGroupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>130</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Quick Camera Control</string>
+              </property>
+              <layout class="QHBoxLayout" name="quickCamLayout" stretch="0,0,0,0,0">
+               <property name="spacing">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="btnSnap">
+                 <property name="maximumSize">
+                  <size>
+                   <width>90</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>SNAP</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnStartStream">
+                 <property name="maximumSize">
+                  <size>
+                   <width>130</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Start Stream</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnStopStream">
+                 <property name="maximumSize">
+                  <size>
+                   <width>130</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Stop Stream</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="streamStatusLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Stream: idle</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>hint</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="camModeGroupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>140</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Mode &amp; Resolution</string>
+              </property>
+              <layout class="QGridLayout" name="camModeGrid">
+               <property name="spacing">
+                <number>8</number>
+               </property>
+               <item row="3" column="0" colspan="5">
+                <layout class="QHBoxLayout" name="camApplyLayout" stretch="0,0,0">
+                 <item>
+                  <widget class="QPushButton" name="btnApplyCamMode">
+                   <property name="maximumWidth"><number>130</number></property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>160</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Apply Mode / Res</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="camCurrentModeLabel">
+                   <property name="text">
+                    <string>Current: —</string>
+                   </property>
+                   <property name="role" stdset="0">
+                    <string>hint</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="resLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Resolution</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="camModeComboBox">
+                 <property name="maximumSize">
+                  <size>
+                   <width>130</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>JPEG</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RGB</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="modeLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Mode</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QComboBox" name="camResComboBox">
+                 <property name="maximumSize">
+                  <size>
+                   <width>130</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>QQVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>QVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>WQVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>VGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>SVGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>XGA</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>SXGA</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <widget class="QCheckBox" name="flashCheckBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Enable flash LED during SNAP (firmware FLASH command)</string>
+                 </property>
+                 <property name="text">
+                  <string>Flash </string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="5">
+                <widget class="QLabel" name="zoomLabel">
+                 <property name="text">
+                  <string>Zoom</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>key</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="6">
+                <widget class="QComboBox" name="zoomComboBox">
+                 <property name="maximumSize">
+                  <size>
+                   <width>80</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Digital zoom factor (ZOOM command). 1 = off, 2 = 2×, 4 = 4×</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>4</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="dsTargetGroupBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size><width>16777215</width><height>220</height></size>
+             </property>
+             <property name="title"><string>Dataset Target</string></property>
+             <layout class="QHBoxLayout" name="dsOuterLayout">
+              <property name="spacing"><number>8</number></property>
+
+              <!-- LEFT: form fields -->
+              <item>
+               <layout class="QGridLayout" name="dsTargetGrid" columnstretch="0,1,0,1">
+                <property name="horizontalSpacing"><number>8</number></property>
+                <property name="verticalSpacing"><number>4</number></property>
+
+                <item row="0" column="0">
+                 <widget class="QLabel" name="dsRootLabel">
+                  <property name="text"><string>Root folder</string></property>
+                  <property name="role" stdset="0"><string>key</string></property>
+                 </widget>
+                </item>
+                <item row="0" column="1" colspan="3">
+                 <widget class="QLineEdit" name="dsRootLineEdit">
+                  <property name="placeholderText"><string>Select dataset root folder…</string></property>
+                 </widget>
+                </item>
+
+                <item row="1" column="0">
+                 <widget class="QLabel" name="dsSplitLabel">
+                  <property name="text"><string>Split</string></property>
+                  <property name="role" stdset="0"><string>key</string></property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="dsSplitCombo">
+                  <item><property name="text"><string>train</string></property></item>
+                  <item><property name="text"><string>val</string></property></item>
+                  <item><property name="text"><string>test</string></property></item>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="dsLabelLabel">
+                  <property name="text"><string>Label</string></property>
+                  <property name="role" stdset="0"><string>key</string></property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QComboBox" name="dsLabelCombo"/>
+                </item>
+
+                <item row="2" column="0">
+                 <widget class="QLabel" name="dsCountLabel">
+                  <property name="text"><string>Count (N)</string></property>
+                  <property name="role" stdset="0"><string>key</string></property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QSpinBox" name="dsCountSpin">
+                  <property name="minimum"><number>1</number></property>
+                  <property name="maximum"><number>9999</number></property>
+                  <property name="value"><number>50</number></property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="dsIntervalLabel">
+                  <property name="text"><string>Interval</string></property>
+                  <property name="role" stdset="0"><string>key</string></property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QSpinBox" name="dsIntervalSpin">
+                  <property name="minimum"><number>100</number></property>
+                  <property name="maximum"><number>30000</number></property>
+                  <property name="singleStep"><number>100</number></property>
+                  <property name="value"><number>1500</number></property>
+                  <property name="suffix"><string> ms</string></property>
+                 </widget>
+                </item>
+
+                <item row="3" column="0" colspan="4">
+                 <widget class="QLabel" name="dsStatusLabel">
+                  <property name="text"><string>Target: — | Existing: — | Saved: 0 / —</string></property>
+                  <property name="role" stdset="0"><string>hint</string></property>
+                 </widget>
+                </item>
+                <item row="4" column="0" colspan="4">
+                 <widget class="QLabel" name="dsBaudHintLabel">
+                  <property name="text"><string>Baudrate hint: —</string></property>
+                  <property name="role" stdset="0"><string>hint</string></property>
+                 </widget>
+                </item>
+                <item row="5" column="0" colspan="4">
+                 <widget class="QProgressBar" name="dsProgress">
+                  <property name="value"><number>0</number></property>
+                 </widget>
+                </item>
+
+               </layout>
+              </item>
+
+              <!-- RIGHT: action buttons stacked vertically -->
+              <item>
+               <layout class="QVBoxLayout" name="dsButtonLayout">
+                <property name="spacing"><number>6</number></property>
+
+                <item>
+                 <widget class="QPushButton" name="dsBrowseButton">
+                  <property name="text"><string>Browse…</string></property>
+                  <property name="toolTip"><string>Select dataset root folder</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="dsForceRgbCheck">
+                  <property name="text"><string>Force RGB / QVGA mode</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="dsSaveButton">
+                  <property name="text"><string>Save Current Frame</string></property>
+                  <property name="toolTip"><string>Save the current frame to the dataset</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="dsCaptureButton">
+                  <property name="text"><string>Capture N Frames</string></property>
+                  <property name="toolTip"><string>Start automatic capture of N frames</string></property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="dsStopButton">
+                  <property name="text"><string>Stop</string></property>
+                  <property name="toolTip"><string>Stop automatic capture</string></property>
+                  <property name="enabled"><bool>false</bool></property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer>
+                  <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+                  <property name="sizeHint" stdset="0"><size><width>0</width><height>5</height></size></property>
+                 </spacer>
+                </item>
+
+               </layout>
+              </item>
+
+             </layout>
+            </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="logGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>220</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Log / STM32 UART Trace</string>
+            </property>
+            <layout class="QVBoxLayout" name="logGroupLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item>
+              <widget class="QPlainTextEdit" name="logEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="logBottomLayout">
+               <item>
+                <widget class="QPushButton" name="btnSaveLog">
+                 <property name="toolTip">
+                  <string>Save the UART log to a file</string>
+                 </property>
+                 <property name="text">
+                  <string>Save Log</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="statLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>FPS — | Size — | Heap —</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>hint</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnGetStatus">
+                 <property name="text">
+                  <string>GET_STATUS</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnClearLog">
+                 <property name="text">
+                  <string>Clear Log</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabVision">
+       <attribute name="title"><string>Vision</string></attribute>
+       <layout class="QVBoxLayout" name="visionRootLayout">
+        <property name="spacing"><number>8</number></property>
+        <property name="leftMargin"><number>8</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>8</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+
+        <!-- ── TOP ROW: 3 image previews ── -->
+        <item>
+         <layout class="QHBoxLayout" name="previewRowLayout">
+          <property name="spacing"><number>8</number></property>
+          <item>
+           <widget class="QGroupBox" name="grayImageGroupBox">
+            <property name="title"><string>Gray</string></property>
+            <layout class="QVBoxLayout"><property name="spacing"><number>2</number></property>
+             <item><widget class="QLabel" name="grayImageLabel">
+ <property name="text"><string>—</string></property>
+ <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
+ <property name="minimumSize"><size><width>200</width><height>170</height></size></property>
+ <property name="sizePolicy">
+  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <horstretch>1</horstretch><verstretch>1</verstretch>
+  </sizepolicy>
+ </property>
+</widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="binaryImageGroupBox">
+            <property name="title"><string>Binary  (local preview)</string></property>
+            <layout class="QVBoxLayout"><property name="spacing"><number>2</number></property>
+             <item><widget class="QLabel" name="binaryImageLabel">
+ <property name="text"><string>—</string></property>
+ <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
+ <property name="minimumSize"><size><width>200</width><height>170</height></size></property>
+ <property name="sizePolicy">
+  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <horstretch>1</horstretch><verstretch>1</verstretch>
+  </sizepolicy>
+ </property>
+</widget></item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="overlayImageGroupBox">
+            <property name="title"><string>Overlay  (CV boxes)</string></property>
+            <layout class="QVBoxLayout"><property name="spacing"><number>2</number></property>
+             <item><widget class="QLabel" name="overlayImageLabel">
+ <property name="text"><string>—</string></property>
+ <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
+ <property name="minimumSize"><size><width>200</width><height>170</height></size></property>
+ <property name="sizePolicy">
+  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <horstretch>1</horstretch><verstretch>1</verstretch>
+  </sizepolicy>
+ </property>
+</widget></item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
+        <!-- ── BOTTOM ROW: TinyML (left) | CV STM32 (right) ── -->
+        <item>
+         <layout class="QHBoxLayout" name="bottomPanelLayout">
+          <property name="spacing"><number>8</number></property>
+
+          <!-- ══ LEFT: TinyML ══ -->
+          <item>
+           <widget class="QScrollArea" name="mlScrollArea">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="horizontalScrollBarPolicy"><enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum></property>
+            <property name="frameShape"><enum>QFrame::Shape::NoFrame</enum></property>
+            <widget class="QWidget" name="mlScrollContents">
+             <layout class="QVBoxLayout" name="mlScrollLayout">
+              <property name="spacing"><number>6</number></property>
+
+              <item>
+               <widget class="QGroupBox" name="mlControlGroupBox">
+                <property name="title"><string>TinyML  (X-CUBE-AI)</string></property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch><verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="mlControlLayout">
+                 <property name="spacing"><number>6</number></property>
+
+                 <!-- mode status banner placeholder (injected at runtime) -->
+
+                 <!-- buttons -->
+                 <item>
+                  <layout class="QHBoxLayout">
+                   <item>
+                    <widget class="QPushButton" name="btnTMGet">
+                     <property name="text"><string>GET</string></property>
+                     <property name="toolTip"><string>TM GET — read TinyML config from STM32</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnRunML">
+                     <property name="text"><string>TM RUN</string></property>
+                     <property name="toolTip"><string>Run TinyML inference on last RGB565 frame</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnSnapAndRunML">
+                     <property name="text"><string>Snap + TM RUN</string></property>
+                     <property name="toolTip"><string>Capture RGB565 frame then run TinyML</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnSaveMLResult">
+                     <property name="text"><string>Save</string></property>
+                     <property name="toolTip"><string>Save TinyML result CSV + JSON</string></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+
+                 <!-- enabled -->
+                 <item>
+                  <layout class="QHBoxLayout">
+                   <item>
+                    <widget class="QCheckBox" name="mlEnabledCheckBox">
+                     <property name="text"><string>TinyML enabled</string></property>
+                     <property name="checked"><bool>true</bool></property>
+                    </widget>
+                   </item>
+                   <item><spacer><property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>0</height></size></property></spacer></item>
+                   
+                  </layout>
+                 </item>
+
+                 <!-- result box -->
+                 <item>
+                  <widget class="QGroupBox" name="mlResultGroupBox">
+                   <property name="title"><string>Result</string></property>
+                   <layout class="QGridLayout" name="mlResultGrid">
+                    <property name="spacing"><number>5</number></property>
+                    <item row="0" column="0"><widget class="QLabel" name="mlPredKeyLabel2"><property name="text"><string>Prediction</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="0" column="1"><widget class="QLabel" name="mlPredValueLabel2"><property name="text"><string>—</string></property></widget></item>
+                    <item row="1" column="0"><widget class="QLabel" name="mlConfKeyLabel2"><property name="text"><string>Confidence</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="1" column="1"><widget class="QLabel" name="mlConfValueLabel2"><property name="text"><string>—</string></property></widget></item>
+                    <item row="2" column="0"><widget class="QLabel" name="mlTimeKeyLabel"><property name="text"><string>Time</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="2" column="1"><widget class="QLabel" name="mlTimeValueLabel"><property name="text"><string>—</string></property></widget></item>
+                    <item row="3" column="0"><widget class="QLabel" name="mlUncertainKeyLabel"><property name="text"><string>Uncertain?</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="3" column="1"><widget class="QLabel" name="mlUncertainLabel"><property name="text"><string>—</string></property></widget></item>
+                    <item row="4" column="0"><widget class="QLabel" name="mlStatusKeyLabel"><property name="text"><string>Status</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="4" column="1"><widget class="QLabel" name="mlStatusLabel"><property name="text"><string>—</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <!-- score bars -->
+                 <item>
+                  <widget class="QGroupBox" name="mlScoreGroupBox">
+                   <property name="title"><string>Class Probabilities</string></property>
+                   <layout class="QGridLayout" name="mlScoreGrid">
+                    <property name="spacing"><number>4</number></property>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="sc0KeyLabel">
+                      <property name="text"><string>count_0</string></property>
+                      <property name="minimumWidth"><number>60</number></property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QProgressBar" name="sc0Bar">
+                      <property name="value"><number>0</number></property>
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="textVisible"><bool>false</bool></property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="sc0ValLabel">
+                      <property name="text"><string>—</string></property>
+                      <property name="minimumWidth"><number>50</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="sc1KeyLabel">
+                      <property name="text"><string>count_1</string></property>
+                      <property name="minimumWidth"><number>60</number></property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QProgressBar" name="sc1Bar">
+                      <property name="value"><number>0</number></property>
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="textVisible"><bool>false</bool></property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QLabel" name="sc1ValLabel">
+                      <property name="text"><string>—</string></property>
+                      <property name="minimumWidth"><number>50</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="sc2KeyLabel">
+                      <property name="text"><string>count_2</string></property>
+                      <property name="minimumWidth"><number>60</number></property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QProgressBar" name="sc2Bar">
+                      <property name="value"><number>0</number></property>
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="textVisible"><bool>false</bool></property>
+                     </widget>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QLabel" name="sc2ValLabel">
+                      <property name="text"><string>—</string></property>
+                      <property name="minimumWidth"><number>50</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="sc3KeyLabel">
+                      <property name="text"><string>count_3</string></property>
+                      <property name="minimumWidth"><number>60</number></property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QProgressBar" name="sc3Bar">
+                      <property name="value"><number>0</number></property>
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="textVisible"><bool>false</bool></property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <widget class="QLabel" name="sc3ValLabel">
+                      <property name="text"><string>—</string></property>
+                      <property name="minimumWidth"><number>50</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="sc4KeyLabel">
+                      <property name="text"><string>count_4</string></property>
+                      <property name="minimumWidth"><number>60</number></property>
+                     </widget>
+                    </item>
+                    <item row="4" column="1">
+                     <widget class="QProgressBar" name="sc4Bar">
+                      <property name="value"><number>0</number></property>
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="textVisible"><bool>false</bool></property>
+                     </widget>
+                    </item>
+                    <item row="4" column="2">
+                     <widget class="QLabel" name="sc4ValLabel">
+                      <property name="text"><string>—</string></property>
+                      <property name="minimumWidth"><number>50</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <!-- meta info -->
+                 <item>
+                  <layout class="QGridLayout">
+                   <property name="spacing"><number>4</number></property>
+                   <item row="0" column="0"><widget class="QLabel" name="mlModelKeyLabel"><property name="text"><string>Model</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                   <item row="0" column="1"><widget class="QLabel" name="mlModelLabel"><property name="text"><string>—</string></property></widget></item>
+                   <item row="1" column="0"><widget class="QLabel" name="mlInputKeyLabel"><property name="text"><string>Input</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                   <item row="1" column="1"><widget class="QLabel" name="mlInputLabel"><property name="text"><string>96×96×3</string></property></widget></item>
+                   <item row="2" column="0"><widget class="QLabel" name="mlMemKeyLabel"><property name="text"><string>RAM/Flash</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                   <item row="2" column="1"><widget class="QLabel" name="mlMemValueLabel"><property name="text"><string>—</string></property></widget></item>
+                   <item row="3" column="0"><widget class="QLabel" name="mlRuntimeLabel"><property name="text"><string>—</string></property><property name="role" stdset="0"><string>hint</string></property></widget></item>
+                  </layout>
+                 </item>
+
+                 <item><spacer><property name="orientation"><enum>Qt::Orientation::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>10</height></size></property></spacer></item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+
+          <!-- ══ RIGHT: CV STM32 ══ -->
+          <item>
+           <widget class="QScrollArea" name="cvScrollArea">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="horizontalScrollBarPolicy"><enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum></property>
+            <property name="frameShape"><enum>QFrame::Shape::NoFrame</enum></property>
+            <widget class="QWidget" name="cvScrollContents">
+             <layout class="QVBoxLayout" name="cvScrollLayout">
+              <property name="spacing"><number>6</number></property>
+
+              <item>
+               <widget class="QGroupBox" name="groupBox">
+                <property name="title"><string>CV  (STM32)</string></property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch><verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="cvMainLayout">
+                 <property name="spacing"><number>6</number></property>
+
+                 <!-- mode status banner placeholder -->
+
+                 <!-- action buttons -->
+                 <item>
+                  <layout class="QHBoxLayout">
+                   <item>
+                    <widget class="QPushButton" name="cvBtnGet">
+                     <property name="text"><string>GET</string></property>
+                     <property name="toolTip"><string>CV GET — read CV config from STM32</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnRunCV">
+                     <property name="text"><string>CV RUN</string></property>
+                     <property name="toolTip"><string>Send all parameters + run CV on STM32</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnSnapAndRunCV">
+                     <property name="text"><string>Snap + CV RUN</string></property>
+                     <property name="toolTip"><string>Capture RGB565 frame then run CV</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="cvBtnBgCap">
+                     <property name="text"><string>BG Cap</string></property>
+                     <property name="toolTip"><string>Capture background reference (CV BGCAP)</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnSaveCVResult">
+                     <property name="text"><string>Save</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnSaveDebugImages">
+                     <property name="text"><string>Save Images</string></property>
+                     <property name="toolTip"><string>Save Gray, Binary and Overlay images</string></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+
+                 <!-- enabled + preset -->
+                 <item>
+                  <layout class="QHBoxLayout">
+                   <item>
+                    <widget class="QCheckBox" name="cvEnableCheck">
+                     <property name="text"><string>CV Enabled</string></property>
+                     <property name="checked"><bool>true</bool></property>
+                    </widget>
+                   </item>
+                   <item><spacer><property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>10</width><height>0</height></size></property></spacer></item>
+                   <item>
+                    <widget class="QLabel" name="cvPresetLabel">
+                     <property name="text"><string>Preset</string></property>
+                     <property name="role" stdset="0"><string>key</string></property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="cvPresetCombo">
+                     <item><property name="text"><string>0 — CUSTOM</string></property></item>
+                     <item><property name="text"><string>1 — FAST</string></property></item>
+                     <item><property name="text"><string>2 — ROBUST</string></property></item>
+                     <item><property name="text"><string>3 — ACCURATE</string></property></item>
+                    </widget>
+                   </item>
+                   
+                   <item>
+                    <widget class="QLabel" name="cvSourceLabel">
+                     <property name="text"><string>Source: STM32</string></property>
+                     <property name="role" stdset="0"><string>hint</string></property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+
+                 <!-- CV parameters grid -->
+                 <item>
+                  <widget class="QGroupBox" name="cvControlGroupBox">
+                   <property name="title"><string>CV Pipeline Control</string></property>
+                   <layout class="QGridLayout" name="cvParamGrid" columnstretch="0,1,0,1,0,1">
+                    <property name="spacing"><number>6</number></property>
+
+                    <!-- row 0: Otsu check | Invert check -->
+                    <item row="0" column="0" colspan="3">
+                     <widget class="QCheckBox" name="cvOtsuCheck">
+                      <property name="text"><string>Otsu (auto threshold)</string></property>
+                      <property name="toolTip"><string>CV THRMODE 1=auto Otsu  0=manual slider (preview is always local)</string></property>
+                     </widget>
+                    </item>
+                    <item row="0" column="3" colspan="3">
+                     <widget class="QCheckBox" name="cvInvertCheck">
+                      <property name="text"><string>Invert binary</string></property>
+                      <property name="toolTip"><string>CV INV 1 — invert after threshold</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 1: Threshold slider -->
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="cvThrLabel">
+                      <property name="text"><string>Threshold</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1" colspan="4">
+                     <widget class="QSlider" name="cvThrSlider">
+                      <property name="minimum"><number>0</number></property>
+                      <property name="maximum"><number>255</number></property>
+                      <property name="value"><number>128</number></property>
+                      <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+                      <property name="toolTip"><string>CV THR 0..255 — updates local preview instantly</string></property>
+                     </widget>
+                    </item>
+                    <item row="1" column="5">
+                     <widget class="QLabel" name="cvThrValueLabel">
+                      <property name="text"><string>128</string></property>
+                      <property name="minimumWidth"><number>28</number></property>
+                      <property name="alignment"><set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 2: Filter | Blur kernel -->
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="cvFilterLabel">
+                      <property name="text"><string>Filter</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1" colspan="2">
+                     <widget class="QComboBox" name="cvFilterCombo">
+                      <property name="toolTip"><string>CV FILTER: 0=OFF 1=BOX 2=MEDIAN</string></property>
+                      <item><property name="text"><string>0 — OFF</string></property></item>
+                      <item><property name="text"><string>1 — BOX</string></property></item>
+                      <item><property name="text"><string>2 — MEDIAN</string></property></item>
+                     </widget>
+                    </item>
+                    <item row="2" column="3">
+                     <widget class="QLabel" name="cvBlurLabel">
+                      <property name="text"><string>Blur k</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="2" column="4" colspan="2">
+                     <widget class="QSpinBox" name="cvBlurSpin">
+                      <property name="minimum"><number>0</number></property>
+                      <property name="maximum"><number>7</number></property>
+                      <property name="toolTip"><string>CV BLUR 0..7</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 3: Morph mode | Morph kernel -->
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="cvMorphModeLabel">
+                      <property name="text"><string>Morph</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1" colspan="2">
+                     <widget class="QComboBox" name="cvMorphModeCombo">
+                      <property name="toolTip"><string>CV MORPHMODE: 0=OFF 1=OPEN 2=CLOSE 3=ERODE 4=DILATE</string></property>
+                      <item><property name="text"><string>0 — OFF</string></property></item>
+                      <item><property name="text"><string>1 — OPEN</string></property></item>
+                      <item><property name="text"><string>2 — CLOSE</string></property></item>
+                      <item><property name="text"><string>3 — ERODE</string></property></item>
+                      <item><property name="text"><string>4 — DILATE</string></property></item>
+                     </widget>
+                    </item>
+                    <item row="3" column="3">
+                     <widget class="QLabel" name="cvMorphKernelLabel">
+                      <property name="text"><string>Morph k</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="3" column="4" colspan="2">
+                     <widget class="QSpinBox" name="cvMorphKernelSpin">
+                      <property name="minimum"><number>0</number></property>
+                      <property name="maximum"><number>7</number></property>
+                      <property name="toolTip"><string>CV MORPH 0..7</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 4: CCL | Min area -->
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="cvConnLabel">
+                      <property name="text"><string>CCL Con.</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="4" column="1" colspan="2">
+                     <widget class="QComboBox" name="cvConnCombo">
+                      <property name="toolTip"><string>CV CON 4|8</string></property>
+                      <item><property name="text"><string>4</string></property></item>
+                      <item><property name="text"><string>8</string></property></item>
+                     </widget>
+                    </item>
+                    <item row="4" column="3">
+                     <widget class="QLabel" name="cvMinAreaLabel">
+                      <property name="text"><string>Min area</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="4" column="4" colspan="2">
+                     <widget class="QSpinBox" name="cvMinAreaSpin">
+                      <property name="maximum"><number>999999</number></property>
+                      <property name="value"><number>50</number></property>
+                      <property name="toolTip"><string>CV MINAREA px²</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 5: Max area | BG sub + Border filt -->
+                    <item row="5" column="0">
+                     <widget class="QLabel" name="cvMaxAreaLabel">
+                      <property name="text"><string>Max area</string></property>
+                      <property name="role" stdset="0"><string>key</string></property>
+                     </widget>
+                    </item>
+                    <item row="5" column="1" colspan="2">
+                     <widget class="QSpinBox" name="cvMaxAreaSpin">
+                      <property name="maximum"><number>999999</number></property>
+                      <property name="toolTip"><string>CV MAXAREA 0=unlimited</string></property>
+                     </widget>
+                    </item>
+                    <item row="5" column="3">
+                     <widget class="QCheckBox" name="cvBgSubCheck">
+                      <property name="text"><string>BG sub</string></property>
+                      <property name="toolTip"><string>CV BGSUB 1</string></property>
+                     </widget>
+                    </item>
+                    <item row="5" column="4" colspan="2">
+                     <widget class="QCheckBox" name="cvBordFiltCheck">
+                      <property name="text"><string>Border filter</string></property>
+                      <property name="checked"><bool>true</bool></property>
+                      <property name="toolTip"><string>CV BORDFILT 1</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 6: AR min | AR max -->
+                    <item row="6" column="0">
+                     <widget class="QLabel" name="cvArMinLabel">
+                      <property name="text"><string>AR min</string></property>
+                      <property name="role" stdset="0"><string>hint</string></property>
+                     </widget>
+                    </item>
+                    <item row="6" column="1" colspan="2">
+                     <widget class="QSpinBox" name="cvArMinSpin">
+                      <property name="maximum"><number>9999</number></property>
+                      <property name="toolTip"><string>CV ASPECT min_x1000</string></property>
+                     </widget>
+                    </item>
+                    <item row="6" column="3">
+                     <widget class="QLabel" name="cvArMaxLabel">
+                      <property name="text"><string>AR max</string></property>
+                      <property name="role" stdset="0"><string>hint</string></property>
+                     </widget>
+                    </item>
+                    <item row="6" column="4" colspan="2">
+                     <widget class="QSpinBox" name="cvArMaxSpin">
+                      <property name="maximum"><number>9999</number></property>
+                      <property name="toolTip"><string>CV ASPECT max_x1000</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 7: Circ | ROI enable + Send ROI -->
+                    <item row="7" column="0">
+                     <widget class="QLabel" name="cvCircMinLabel">
+                      <property name="text"><string>Circ min</string></property>
+                      <property name="role" stdset="0"><string>hint</string></property>
+                     </widget>
+                    </item>
+                    <item row="7" column="1" colspan="2">
+                     <widget class="QSpinBox" name="cvCircMinSpin">
+                      <property name="maximum"><number>1000</number></property>
+                      <property name="toolTip"><string>CV CIRC min_x1000</string></property>
+                     </widget>
+                    </item>
+                    <item row="7" column="3">
+                     <widget class="QCheckBox" name="cvRoiEnableCheck">
+                      <property name="text"><string>ROI</string></property>
+                      <property name="toolTip"><string>CV ROI enable</string></property>
+                     </widget>
+                    </item>
+                    <item row="7" column="4" colspan="2">
+                     <widget class="QPushButton" name="cvBtnSendRoi">
+                      <property name="text"><string>Send ROI</string></property>
+                     </widget>
+                    </item>
+
+                    <!-- row 8: ROI X Y W H -->
+                    <item row="8" column="0">
+                     <widget class="QLabel"><property name="text"><string>X</string></property><property name="role" stdset="0"><string>hint</string></property></widget>
+                    </item>
+                    <item row="8" column="1">
+                     <widget class="QSpinBox" name="cvRoiXSpin"><property name="maximum"><number>9999</number></property></widget>
+                    </item>
+                    <item row="8" column="2">
+                     <widget class="QLabel"><property name="text"><string>Y</string></property><property name="role" stdset="0"><string>hint</string></property></widget>
+                    </item>
+                    <item row="8" column="3">
+                     <widget class="QSpinBox" name="cvRoiYSpin"><property name="maximum"><number>9999</number></property></widget>
+                    </item>
+                    <item row="8" column="4">
+                     <widget class="QLabel"><property name="text"><string>W</string></property><property name="role" stdset="0"><string>hint</string></property></widget>
+                    </item>
+                    <item row="8" column="5">
+                     <widget class="QSpinBox" name="cvRoiWSpin"><property name="maximum"><number>9999</number></property></widget>
+                    </item>
+                    <item row="9" column="0">
+                     <widget class="QLabel"><property name="text"><string>H</string></property><property name="role" stdset="0"><string>hint</string></property></widget>
+                    </item>
+                    <item row="9" column="1">
+                     <widget class="QSpinBox" name="cvRoiHSpin"><property name="maximum"><number>9999</number></property></widget>
+                    </item>
+
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <!-- CV Result -->
+                 <item>
+                  <widget class="QGroupBox" name="cvResultGroupBox">
+                   <property name="title"><string>CV Result  (CVSTAT)</string></property>
+                   <layout class="QGridLayout" name="cvResultGrid">
+                    <property name="spacing"><number>5</number></property>
+                    <item row="0" column="0"><widget class="QLabel" name="cvResObjKeyLbl"><property name="text"><string>Objects:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="0" column="1"><widget class="QLabel" name="cvResObjLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="0" column="2"><widget class="QLabel" name="cvResTimeKeyLbl"><property name="text"><string>Time (ms):</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="0" column="3"><widget class="QLabel" name="cvResTimeLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="1" column="0"><widget class="QLabel" name="cvResMeanAreaKeyLbl"><property name="text"><string>Mean area:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="1" column="1"><widget class="QLabel" name="cvResMeanAreaLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="1" column="2"><widget class="QLabel" name="cvResMinAreaKeyLbl"><property name="text"><string>Min area:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="1" column="3"><widget class="QLabel" name="cvResMinAreaLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="2" column="0"><widget class="QLabel" name="cvResMaxAreaKeyLbl"><property name="text"><string>Max area:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="2" column="1"><widget class="QLabel" name="cvResMaxAreaLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="2" column="2"><widget class="QLabel" name="cvResBrightKeyLbl"><property name="text"><string>Brightness:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="2" column="3"><widget class="QLabel" name="cvResBrightLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="3" column="0"><widget class="QLabel" name="cvResFgPixKeyLbl"><property name="text"><string>FG pixels:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="3" column="1"><widget class="QLabel" name="cvResFgPixLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="3" column="2"><widget class="QLabel" name="cvResRawCompKeyLbl"><property name="text"><string>Raw CCL:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="3" column="3"><widget class="QLabel" name="cvResRawCompLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="4" column="0"><widget class="QLabel" name="cvResBoxesKeyLbl"><property name="text"><string>Boxes:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="4" column="1"><widget class="QLabel" name="cvResBoxesLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="4" column="2"><widget class="QLabel" name="cvRejSmallKeyLbl"><property name="text"><string>Rej. small:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="4" column="3"><widget class="QLabel" name="cvRejSmallLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="5" column="0"><widget class="QLabel" name="cvRejLargeKeyLbl"><property name="text"><string>Rej. large:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="5" column="1"><widget class="QLabel" name="cvRejLargeLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="5" column="2"><widget class="QLabel" name="cvRejBorderKeyLbl"><property name="text"><string>Rej. border:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="5" column="3"><widget class="QLabel" name="cvRejBorderLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="6" column="0"><widget class="QLabel" name="cvRejShapeKeyLbl"><property name="text"><string>Rej. shape:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="6" column="1"><widget class="QLabel" name="cvRejShapeLbl"><property name="text"><string>—</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <!-- Firmware Config Readback -->
+                 <item>
+                  <widget class="QGroupBox" name="cvFirmwareCfgGroupBox">
+                   <property name="title"><string>Firmware Config Readback  (CVCFG)</string></property>
+                   <layout class="QGridLayout" name="cvFwGrid">
+                    <property name="spacing"><number>5</number></property>
+                    <item row="0" column="0"><widget class="QLabel" name="cvFwEnabledKeyLbl"><property name="text"><string>Enabled:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="0" column="1"><widget class="QLabel" name="cvFwEnabledLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="0" column="2"><widget class="QLabel" name="cvFwPresetKeyLbl"><property name="text"><string>Preset:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="0" column="3"><widget class="QLabel" name="cvFwPresetLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="1" column="0"><widget class="QLabel" name="cvFwThrModeKeyLbl"><property name="text"><string>Thr mode:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="1" column="1"><widget class="QLabel" name="cvFwThrModeLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="1" column="2"><widget class="QLabel" name="cvFwThrKeyLbl"><property name="text"><string>Threshold:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="1" column="3"><widget class="QLabel" name="cvFwThrLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="2" column="0"><widget class="QLabel" name="cvFwInvKeyLbl"><property name="text"><string>Invert:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="2" column="1"><widget class="QLabel" name="cvFwInvLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="2" column="2"><widget class="QLabel" name="cvFwFilterKeyLbl"><property name="text"><string>Filter:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="2" column="3"><widget class="QLabel" name="cvFwFilterLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="3" column="0"><widget class="QLabel" name="cvFwBlurKeyLbl"><property name="text"><string>Blur kernel:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="3" column="1"><widget class="QLabel" name="cvFwBlurLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="3" column="2"><widget class="QLabel" name="cvFwMorphModeKeyLbl"><property name="text"><string>Morph mode:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="3" column="3"><widget class="QLabel" name="cvFwMorphModeLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="4" column="0"><widget class="QLabel" name="cvFwMorphKKeyLbl"><property name="text"><string>Morph kernel:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="4" column="1"><widget class="QLabel" name="cvFwMorphKLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="4" column="2"><widget class="QLabel" name="cvFwConnKeyLbl"><property name="text"><string>Connectivity:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="4" column="3"><widget class="QLabel" name="cvFwConnLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="5" column="0"><widget class="QLabel" name="cvFwMinAreaKeyLbl"><property name="text"><string>Min area:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="5" column="1"><widget class="QLabel" name="cvFwMinAreaLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="5" column="2"><widget class="QLabel" name="cvFwMaxAreaKeyLbl"><property name="text"><string>Max area:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="5" column="3"><widget class="QLabel" name="cvFwMaxAreaLbl"><property name="text"><string>0 (0=unlimited)</string></property></widget></item>
+                    <item row="6" column="0"><widget class="QLabel" name="cvFwBordFiltKeyLbl"><property name="text"><string>Border filter:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="6" column="1"><widget class="QLabel" name="cvFwBordFiltLbl"><property name="text"><string>—</string></property></widget></item>
+                    <item row="6" column="2"><widget class="QLabel" name="cvFwBgSubKeyLbl"><property name="text"><string>BG subtraction:</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
+                    <item row="6" column="3"><widget class="QLabel" name="cvFwBgSubLbl"><property name="text"><string>—</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <!-- Bounding Box Table -->
+                 <item>
+                  <widget class="QGroupBox" name="cvBoxTableGroupBox">
+                   <property name="title"><string>Bounding Boxes  (CVBOX — up to 8)</string></property>
+                   <layout class="QVBoxLayout">
+                    <item>
+                     <widget class="QTableWidget" name="cvBoxTable">
+                      <property name="minimumHeight"><number>90</number></property>
+                      <property name="maximumHeight"><number>160</number></property>
+                      <column><property name="text"><string>ID</string></property></column>
+                      <column><property name="text"><string>Area</string></property></column>
+                      <column><property name="text"><string>X</string></property></column>
+                      <column><property name="text"><string>Y</string></property></column>
+                      <column><property name="text"><string>W</string></property></column>
+                      <column><property name="text"><string>H</string></property></column>
+                      <column><property name="text"><string>Perimeter</string></property></column>
+                      <column><property name="text"><string>Circ.</string></property></column>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+
+                 <item><spacer><property name="orientation"><enum>Qt::Orientation::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>10</height></size></property></spacer></item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+
+         </layout>
+        </item>
+
+       </layout>
+      </widget>
+
+      <widget class="QWidget" name="tabBenchmark">
+       <attribute name="title">
+        <string>Benchmark</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="benchRootLayout">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="leftMargin">
+         <number>8</number>
+        </property>
+        <property name="topMargin">
+         <number>8</number>
+        </property>
+        <property name="rightMargin">
+         <number>8</number>
+        </property>
+        <property name="bottomMargin">
+         <number>8</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="benchLiveGroupBox">
+          <property name="title">
+           <string>Live Firmware Statistics  (last STAT: message)</string>
+          </property>
+          <layout class="QHBoxLayout" name="benchLiveLayout">
+           <property name="spacing">
+            <number>16</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="benchFpsKeyLabel">
+             <property name="text">
+              <string>FPS</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchFpsLabel">
+             <property name="text">
+              <string>—</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchLatKeyLabel">
+             <property name="text">
+              <string>Latency</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchLatLabel">
+             <property name="text">
+              <string>—</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchSizeKeyLabel">
+             <property name="text">
+              <string>Frame size</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchSizeLabel">
+             <property name="text">
+              <string>—</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchHeapKeyLabel">
+             <property name="text">
+              <string>Free heap</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchHeapLabel">
+             <property name="text">
+              <string>—</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchFbKeyLabel">
+             <property name="text">
+              <string>Frame buf</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="benchFbLabel">
+             <property name="text">
+              <string>—</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="benchGroupBox">
+          <property name="title">
+           <string>Run History</string>
+          </property>
+          <layout class="QVBoxLayout" name="benchGroupLayout">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="benchActionLayout">
+             <item>
+              <widget class="QPushButton" name="btnAddRun">
+               <property name="text">
+                <string>Add Current Run</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnDeleteLastRun">
+               <property name="toolTip">
+                <string>Remove the most recently added row</string>
+               </property>
+               <property name="text">
+                <string>Delete Last Run</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnExportCSV">
+               <property name="text">
+                <string>Export CSV…</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnClearBench">
+               <property name="text">
+                <string>Clear All</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="gtLabel">
+               <property name="text">
+                <string>GT Count</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>key</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="gtComboBox">
+               <item>
+                <property name="text">
+                 <string>—</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>0</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>3</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="benchTable"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="evalLabelsLayout">
+             <item>
+              <widget class="QLabel" name="evalRunsLabel">
+               <property name="text">
+                <string>Runs: 0</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalCVAccLabel">
+               <property name="text">
+                <string>CV Acc: —</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalMLAccLabel">
+               <property name="text">
+                <string>ML Acc: —</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalCVLatLabel">
+               <property name="text">
+                <string>CV Ø: — ms</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalMLLatLabel">
+               <property name="text">
+                <string>ML Ø: — ms</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalUncLabel">
+               <property name="text">
+                <string>Uncertain: 0</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="benchSummaryLabel">
+               <property name="text">
+                <string>Runs: 0 | CV — | TinyML —</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>value</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="evalLastSaveLabel">
+               <property name="text">
+                <string>Last save: —</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="benchDiagGroupBox">
+          <property name="title">
+           <string>UART / Stream Diagnostics</string>
+          </property>
+          <layout class="QVBoxLayout" name="benchDiagLayout">
+           <item>
+            <widget class="QPlainTextEdit" name="benchDiagEdit">
+             <property name="toolTip">
+              <string>Filtered STAT: and WARN: messages for performance diagnostics</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout">
+             <item>
+              <widget class="QPushButton" name="btnClearDiag">
+               <property name="text">
+                <string>Clear Diag Log</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,73 @@
+# ============================================================
+# STM32 Edge Vision — root .gitignore
+# ============================================================
+
+# ── Excluded by user request ─────────────────────────────────
+Ablauf/
+MERO2_Bericht/
+Revised_Expose_STM32_Edge_Vision_counting.docx
+
+# ── STM32CubeIDE workspace metadata ──────────────────────────
+CubeIDE_Workspace/.metadata/
+CubeIDE_Workspace/**/.settings/
+CubeIDE_Workspace/**/Debug/
+CubeIDE_Workspace/**/Release/
+CubeIDE_Workspace/**/*.launch
+CubeIDE_Workspace/**/*.mk
+CubeIDE_Workspace/**/makefile
+CubeIDE_Workspace/**/objects.list
+CubeIDE_Workspace/**/*.d
+CubeIDE_Workspace/**/*.o
+CubeIDE_Workspace/**/*.elf
+CubeIDE_Workspace/**/*.bin
+CubeIDE_Workspace/**/*.hex
+CubeIDE_Workspace/**/*.map
+CubeIDE_Workspace/**/*.lst
+
+# ── ML training — large binary/generated files ───────────────
+# Dataset images: use Git LFS or keep locally
+ML training/dataset/
+# Trained models: generated artefacts — reproduce via training
+ML training/Model/stm32ai-modelzoo-services/
+ML training/outputs/
+# Keep .gitkeep placeholder
+!ML training/outputs/.gitkeep
+
+# ── ML training — experiment outputs (Hydra / MLflow) ────────
+ML training/Model/image_classification/logs/
+ML training/Model/image_classification/saved_models/
+ML training/Model/image_classification/tf/src/experiments_outputs/
+
+# ── Large installer packages ──────────────────────────────────
+Packages/*.zip
+Packages/*.exe
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.eggs/
+
+# ── PyInstaller build artefacts ──────────────────────────────
+GUI_App/build/*
+!GUI_App/build/.gitkeep
+GUI_App/dist/*
+
+# ── GUI runtime outputs ───────────────────────────────────────
+GUI_App/outputs/logs/*
+GUI_App/outputs/frames/*
+GUI_App/outputs/debug_images/*
+GUI_App/outputs/benchmark/*
+GUI_App/outputs/dataset/*
+!GUI_App/outputs/**/.gitkeep
+GUI_App/examples/*
+!GUI_App/examples/.gitkeep
+
+# ── Editor / OS ───────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
