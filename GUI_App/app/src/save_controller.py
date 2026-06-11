@@ -10,10 +10,9 @@ import csv
 import json
 from datetime import datetime
 
-from PIL import Image
 from PySide6.QtWidgets import QMessageBox
 
-from app_helpers import norm01, is_tm_uncertain, qimage_to_pil_rgb, timestamp
+from app_helpers import norm01, is_tm_uncertain, timestamp
 
 
 class SaveMixin:
@@ -250,30 +249,3 @@ class SaveMixin:
             return
         self._log("INFO", f"Saved log → {self._relative_to_project(path)}")
 
-    # ---------------------------------------------------------------- save all
-    def _save_all_clicked(self) -> None:
-        """Save all available data: frame, debug images, CV, TinyML, benchmark, log."""
-        has_frame = self._last_qimg is not None and not self._last_qimg.isNull()
-        has_cv    = self._cv_result  is not None
-        has_tm    = self._tm_result  is not None
-        has_bench = bool(self._bench_rows)
-        has_log   = bool(self._w("logEdit").toPlainText().strip())
-        if not any([has_frame, has_cv, has_tm, has_bench, has_log]):
-            QMessageBox.information(
-                self.window, "Save All", "Nothing to save yet.")
-            return
-        if has_frame:
-            self._save_current_frame_clicked()
-            self._save_debug_images_clicked()
-        if has_cv:
-            self._save_cv_result_clicked()
-        if has_tm:
-            self._save_ml_result_clicked()
-        if has_bench:
-            self._export_csv()
-        if has_log:
-            self._save_log_clicked()
-        out = self._get_or_create_image_folder()
-        self._log("INFO",
-            f"Save All completed → {self._relative_to_project(out)}")
-        self._set_eval_last_save(str(out))

@@ -338,6 +338,7 @@ static void handle_cv(camera_app_t *app, char *sub)
         cvext_set_aspect_ratio_range(
             (uint32_t)strtoul(arg2, NULL, 10),
             (uint32_t)strtoul(arg3, NULL, 10));
+        app->cv_cfg.preset = CV_PRESET_CUSTOM;
         camproto_send_cv_config(app);
         return;
     }
@@ -349,6 +350,7 @@ static void handle_cv(camera_app_t *app, char *sub)
             return;
         }
         cvext_set_circularity_min((uint32_t)strtoul(arg2, NULL, 10));
+        app->cv_cfg.preset = CV_PRESET_CUSTOM;
         camproto_send_cv_config(app);
         return;
     }

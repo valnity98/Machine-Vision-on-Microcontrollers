@@ -39,7 +39,10 @@ class BenchMixin:
         unc      = is_tm_uncertain(self._tm_result)
 
         gt_raw   = self._w("gtComboBox").currentText().strip()
-        gt_count = None if gt_raw == "—" else int(gt_raw)
+        try:
+            gt_count = None if gt_raw == "—" else int(gt_raw)
+        except ValueError:
+            gt_count = None
 
         def _match(value, gt) -> str:
             if value is None or gt is None:

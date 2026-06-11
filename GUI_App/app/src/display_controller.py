@@ -6,7 +6,7 @@ Redesigned: full local CV pipeline (gray, binary, overlay) computed in Python.
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QRect
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QImage, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import QLabel
 

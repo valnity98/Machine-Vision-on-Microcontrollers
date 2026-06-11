@@ -9,9 +9,8 @@ from __future__ import annotations
 import re
 
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QImage
 
-from image_utils import jpeg_bytes_to_qimage, rgb565_bytes_to_qimage
+from image_utils import jpeg_bytes_to_qimage, rgb565_bytes_to_qimage, gray8_bytes_to_qimage
 from app_helpers import FrameTransfer, norm01
 from protocol_parser import (
     TINYML_INPUT_DESC, TmResult,
@@ -104,18 +103,7 @@ class RxMixin:
         elif fmt == "RGB565":
             qimg = rgb565_bytes_to_qimage(raw, w, h)
         elif fmt == "GRAY":
-            expected = w * h
-            if len(raw) < expected or w <= 0 or h <= 0:
-                self._log("WARN",
-                    f"Frame #{self._frame_count}: GRAY frame too short")
-                return
-            out = bytearray(w * h * 3)
-            for i in range(w * h):
-                v = raw[i]
-                out[i * 3] = out[i * 3 + 1] = out[i * 3 + 2] = v
-            qimg = QImage(
-                bytes(out), w, h, w * 3,
-                QImage.Format.Format_RGB888).copy()
+            qimg = gray8_bytes_to_qimage(raw, w, h)
         else:
             self._log("WARN", f"Unknown frame format: {fmt}")
             return

@@ -88,18 +88,15 @@ def norm01(value: float) -> float:
     """
     Normalise a firmware confidence value to 0.0–1.0.
 
-    The firmware sends confidence in permille (0..1000).
-    Older firmware may send it as a percentage (0..100).
-    Both forms are handled transparently.
+    The firmware sends confidence as permille (0..1000).
+    Values already in [0.0, 1.0] are returned unchanged.
     """
     try:
         v = float(value)
     except Exception:
         return 0.0
-    if v >= 100.0:
+    if v > 1.0:
         v /= 1000.0
-    elif v > 1.0:
-        v /= 100.0
     return max(0.0, min(1.0, v))
 
 

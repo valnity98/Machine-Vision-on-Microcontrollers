@@ -40,7 +40,7 @@ from PySide6.QtWidgets import (
 
 # ── Modular imports ────────────────────────────────────────────────────────
 from app_constants import (
-    BENCH_LABELS, LOG_MAX_LINES,
+    BENCH_LABELS, BOX_LABELS, LOG_MAX_LINES,
     FRAME_TIMEOUT_MS, DEFAULT_BAUDRATE, DEFAULT_BAUDRATE_INT,
     STYLESHEET,
 )
@@ -258,6 +258,8 @@ class ReferenceWindowController(
             cv_tbl.horizontalHeader().setFixedHeight(28)
             cv_tbl.verticalHeader().setDefaultSectionSize(22)
             cv_tbl.setFrameShape(QFrame.Shape.Box)
+            cv_tbl.setColumnCount(len(BOX_LABELS))
+            cv_tbl.setHorizontalHeaderLabels(BOX_LABELS)
             for col, cw in enumerate([36, 72, 52, 52, 52, 52, 80, 76]):
                 cv_tbl.setColumnWidth(col, cw)
             cv_tbl.horizontalHeader().setStretchLastSection(True)

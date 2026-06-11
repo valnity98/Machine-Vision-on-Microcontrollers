@@ -34,7 +34,7 @@ BENCH_COLS: list[tuple[str, str]] = [
 BENCH_KEYS   = [c[0] for c in BENCH_COLS]
 BENCH_LABELS = [c[1] for c in BENCH_COLS]
 
-BOX_LABELS = ["ID", "Area [px²]", "X", "Y", "W", "H", "Circ."]
+BOX_LABELS = ["ID", "Area [px²]", "X", "Y", "W", "H", "Perimeter", "Circularity"]
 
 LOG_MAX_LINES          = 1200
 TM_UNCERTAIN_THRESHOLD = 0.40
