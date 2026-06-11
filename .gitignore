@@ -33,6 +33,45 @@ ML training/outputs/
 # Keep .gitkeep placeholder
 !ML training/outputs/.gitkeep
 
+# ── X-CUBE-AI — validation / test framework (not needed for deployment) ──────
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiPbIO.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiPbMemRWServices.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiPbMgr.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiTestHelper.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiTestUtility.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/aiValidation.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/ai_device_adaptor.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/ai_io_buffers_ATON.h
+CubeIDE_Workspace/**/X-CUBE-AI/App/ai_wrapper_ATON.h
+CubeIDE_Workspace/**/X-CUBE-AI/App/lc_print.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/pb.h
+CubeIDE_Workspace/**/X-CUBE-AI/App/pb_common.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/pb_decode.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/pb_encode.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/stm32msg.pb.*
+CubeIDE_Workspace/**/X-CUBE-AI/App/syscalls.c
+CubeIDE_Workspace/**/X-CUBE-AI/Target/
+
+# ── ML training — large generated artifacts from experiment runs ──────────────
+ML training/Model/20*/saved_models/
+ML training/Model/20*/logs/train/
+ML training/Model/20*/logs/validation/
+ML training/Model/20*/logs/metrics/events.out.tfevents.*
+ML training/Model/20*/.hydra/
+ML training/Model/20*/*.log
+
+# ── ST Model Zoo source (external — clone separately) ─────────────────────────
+ML training/Model/image_classification/config_file_examples/
+ML training/Model/image_classification/config_file_examples_pt/
+ML training/Model/image_classification/datasets/
+ML training/Model/image_classification/docs/
+ML training/Model/image_classification/pt/
+ML training/Model/image_classification/tf/
+ML training/Model/image_classification/__init__.py
+ML training/Model/image_classification/stm32ai_main.py
+ML training/Model/image_classification/LICENSE.md
+ML training/Model/image_classification/README.md
+
 # ── ML training — experiment outputs (Hydra / MLflow) ────────
 ML training/Model/image_classification/logs/
 ML training/Model/image_classification/saved_models/

@@ -3,102 +3,126 @@
 A complete embedded-vision demonstrator for **STM32H7 + OV2640**:
 
 - Real-time camera capture via DCMI/DMA
-- Classical Vision (CV) object detection with Otsu/manual threshold, morphology and bounding-box extraction — runs on-chip
-- TinyML object counting (MobileNetV1-0.25, 5 classes) via X-CUBE-AI — runs on-chip
+- Classical Vision (CV) object detection — Otsu/manual threshold, morphology, bounding-box extraction — **runs on-chip**
+- TinyML object counting (MobileNetV1-0.25, 5 classes) via X-CUBE-AI — **runs on-chip**
 - PySide6 Reference Dashboard on the PC for control, visualisation, benchmarking and dataset capture
 
-> **All inference runs on the STM32.** The GUI only visualises results, saves frames, and manages the benchmark. It never simulates or locally computes CV/TinyML results.
+> **All inference runs on the STM32.** The GUI only visualises results, saves frames, and manages the benchmark.
 
 ---
 
 ## Table of contents
 
-1. [Repository structure](#repository-structure)
-2. [Hardware setup](#hardware-setup)
-3. [Quick start — GUI](#quick-start--gui)
-4. [Quick start — ML training](#quick-start--ml-training)
-5. [Model specification](#model-specification)
-6. [UART protocol](#uart-protocol)
-7. [Dataset capture workflow](#dataset-capture-workflow)
-8. [Training workflow](#training-workflow)
-9. [STM32 deployment (X-CUBE-AI)](#stm32-deployment-x-cube-ai)
-10. [Benchmarking](#benchmarking)
-11. [Troubleshooting](#troubleshooting)
-12. [Dependencies](#dependencies)
+1. [System architecture](#system-architecture)
+2. [Repository structure](#repository-structure)
+3. [Hardware setup](#hardware-setup)
+4. [Quick start — GUI](#quick-start--gui)
+5. [Quick start — ML training](#quick-start--ml-training)
+6. [Model specification](#model-specification)
+7. [Training results](#training-results)
+8. [CV pipeline](#cv-pipeline)
+9. [UART protocol](#uart-protocol)
+10. [Dataset capture workflow](#dataset-capture-workflow)
+11. [Training workflow](#training-workflow)
+12. [STM32 deployment (X-CUBE-AI)](#stm32-deployment-x-cube-ai)
+13. [Benchmarking](#benchmarking)
+14. [Troubleshooting](#troubleshooting)
+15. [Dependencies](#dependencies)
+
+---
+
+## System architecture
+
+```mermaid
+flowchart LR
+    subgraph STM32H7["STM32H7 Nucleo-144"]
+        CAM["OV2640\nCamera"] -->|DCMI/DMA| FB["Frame Buffer\nRGB565 / JPEG"]
+        FB --> CV["CV Engine\nOtsu · Morph · CCL"]
+        FB --> TM["TinyML Engine\nMobileNetV1-0.25\nX-CUBE-AI"]
+        CV --> UART["UART TX\n2 Mbit/s"]
+        TM --> UART
+        FB --> UART
+    end
+    subgraph PC["PC — PySide6 Dashboard"]
+        UART -->|USB/VCP| RX["RX Parser\nprotocol_parser.py"]
+        RX --> DISP["Display\nPreview · CV · ML"]
+        RX --> BENCH["Benchmark\nCSV Export"]
+        RX --> DS["Dataset Capture\nRGB565 / QVGA"]
+    end
+```
 
 ---
 
 ## Repository structure
 
 ```text
-STM32_MERO2/
+Machine-Vision-on-Microcontrollers/
 │
 ├─ GUI_App/                              # PySide6 Reference Dashboard
-│  ├─ app/
-│  │  ├─ src/
-│  │  │  ├─ main.py                      # Qt application entry point
-│  │  │  ├─ reference_window.py          # Main GUI controller
-│  │  │  ├─ protocol_parser.py           # STM32 UART protocol parser
-│  │  │  ├─ serial_service.py            # QSerialPort wrapper
-│  │  │  ├─ image_utils.py               # JPEG / RGB565 image conversion
-│  │  │  ├─ dashboard_controller.py      # Serial + camera mode (DashboardMixin)
-│  │  │  ├─ rx_controller.py             # UART RX path, frame decode (RxMixin)
-│  │  │  ├─ display_controller.py        # Preview refresh, CV/ML labels (DisplayMixin)
-│  │  │  ├─ bench_controller.py          # Benchmark table, CSV export (BenchMixin)
-│  │  │  ├─ save_controller.py           # Frame/log save operations (SaveMixin)
-│  │  │  ├─ dataset_controller.py        # Automated dataset capture (DatasetMixin)
-│  │  │  ├─ app_constants.py             # Constants, stylesheet
-│  │  │  └─ app_helpers.py               # Path helpers, FrameTransfer, norm01
-│  │  ├─ ui/
-│  │  │  └─ reference_window.ui          # Qt Designer layout
-│  │  └─ assets/
-│  │     └─ app_icon.ico
-│  ├─ packaging/
-│  │  ├─ build_windows_exe.bat           # PyInstaller build script
-│  │  └─ STM32_Edge_Vision_Reference_Dashboard.spec
-│  └─ outputs/                           # Runtime exports (git-ignored)
-│     ├─ logs/
-│     ├─ frames/
-│     ├─ debug_images/
-│     ├─ benchmark/
-│     └─ dataset/
+│  └─ app/
+│     ├─ src/
+│     │  ├─ main.py                      # Qt application entry point
+│     │  ├─ reference_window.py          # Main controller (6 mixins)
+│     │  ├─ protocol_parser.py           # STM32 UART protocol parser
+│     │  ├─ serial_service.py            # QSerialPort wrapper
+│     │  ├─ image_utils.py               # JPEG / RGB565 / GRAY conversion
+│     │  ├─ dashboard_controller.py      # Serial + camera mode (DashboardMixin)
+│     │  ├─ rx_controller.py             # UART RX path, frame decode (RxMixin)
+│     │  ├─ display_controller.py        # Preview refresh, CV/ML labels (DisplayMixin)
+│     │  ├─ bench_controller.py          # Benchmark table, CSV export (BenchMixin)
+│     │  ├─ save_controller.py           # Frame/log save (SaveMixin)
+│     │  ├─ dataset_controller.py        # Automated dataset capture (DatasetMixin)
+│     │  ├─ app_constants.py             # Constants, stylesheet
+│     │  └─ app_helpers.py               # Path helpers, FrameTransfer, norm01
+│     ├─ ui/
+│     │  └─ reference_window.ui          # Qt Designer layout
+│     └─ assets/
+│        └─ app_icon.ico
 │
 ├─ CubeIDE_Workspace/
 │  └─ STM32_H7Firmware/                  # STM32CubeIDE project
-│     └─ Core/
-│        ├─ Src/
-│        │  ├─ main.c
-│        │  ├─ camera_app.c / .h
-│        │  ├─ camera_capture.c / .h
-│        │  ├─ camera_proto.c / .h
-│        │  ├─ camera_parse.c / .h
-│        │  ├─ cv_engine.c / .h
-│        │  ├─ tinyml_engine.c / .h
-│        │  ├─ tinyml_preprocess.c / .h
-│        │  ├─ uart_tx.c / .h
-│        │  └─ ov2640_Drive.c / .h
-│        └─ Inc/                         # Corresponding header files
+│     ├─ Core/
+│     │  ├─ Src/
+│     │  │  ├─ main.c                    # Buffer alloc, MPU, task creation
+│     │  │  ├─ camera_app.c/.h           # UART command handler, FreeRTOS tasks
+│     │  │  ├─ camera_capture.c/.h       # DCMI/DMA frame capture
+│     │  │  ├─ camera_proto.c/.h         # UART protocol formatters
+│     │  │  ├─ camera_parse.c/.h         # Command parser
+│     │  │  ├─ cv_engine.c/.h            # CV pipeline (7 stages)
+│     │  │  ├─ tinyml_engine.c/.h        # X-CUBE-AI inference wrapper
+│     │  │  ├─ tinyml_preprocess.c/.h    # RGB565 → uint8 96×96 tensor
+│     │  │  ├─ uart_tx.c/.h              # Non-blocking DMA UART TX
+│     │  │  └─ ov2640_Drive.c/.h         # OV2640 camera driver
+│     │  └─ Inc/                         # Corresponding header files
+│     └─ X-CUBE-AI/                      # Generated by STM32CubeMX
+│        └─ App/
+│           ├─ network.c/.h              # Generated AI network kernel
+│           ├─ network_data.c/.h         # Model weights (Flash)
+│           ├─ network_data_params.c/.h  # Weight parameters
+│           ├─ network_config.h          # Network configuration
+│           ├─ network_generate_report.txt # X-CUBE-AI analysis report
+│           ├─ app_x-cube-ai.c/.h        # Integration layer
+│           └─ constants_ai.h
 │
 ├─ ML training/                          # PC-side TinyML workflow
-│  ├─ dataset/
-│  │  ├─ train/ count_0…count_4/         # ≥ 50 images per class recommended
-│  │  └─ val/   count_0…count_4/         # ≥ 10 images per class recommended
+│  ├─ dataset/                           # git-ignored — keep locally
+│  │  ├─ train/ count_0…count_4/         # ≥ 50 images per class
+│  │  └─ val/   count_0…count_4/         # ≥ 10 images per class
 │  ├─ src/
-│  │  ├─ predict_count_tflite.py         # PC-side TFLite verification
-│  │  ├─ check_dataset.py                # Dataset structure validator
-│  │  └─ train_count_model.py            # Standalone Keras training script
-│  ├─ Model/
-│  │  └─ image_classification/
-│  │     └─ user_config.yaml             # ST Model Zoo training config
-│  └─ docs/
-│     └─ DATASET_GUIDE.md
-│
-├─ Ablauf/                               # Architecture diagrams (PlantUML)
-│  ├─ plantuml_alle_diagramme.puml
-│  └─ cv_tinyml_uebersicht.puml
+│  │  ├─ train_count_model.py            # Standalone Keras training script
+│  │  ├─ predict_count_tflite.py         # PC-side TFLite verification + hash check
+│  │  └─ check_dataset.py                # Dataset structure validator
+│  └─ Model/
+│     ├─ quantized_model.tflite          # ← Deployable model (214 KiB)
+│     ├─ image_classification/
+│     │  └─ user_config.yaml             # ST Model Zoo training config
+│     └─ 2026_05_03_09_11_10/            # Training run artefacts
+│        ├─ Training_curves.png          # Loss / accuracy curves
+│        ├─ logs/metrics/train_metrics.csv
+│        └─ quantized_models/quantized_model.tflite
 │
 ├─ requirements.txt                      # Unified Python dependencies
-└─ README.md                             # This file
+└─ README.md
 ```
 
 ---
@@ -107,11 +131,20 @@ STM32_MERO2/
 
 | Part | Details |
 |------|---------|
-| MCU | STM32H7 — Nucleo-144 |
+| MCU board | STM32H743ZI — Nucleo-144 |
 | Camera | OV2640, connected via DCMI + DMA |
 | UART | USART3 → ST-LINK VCP, **2 000 000 Baud, 8N1** |
-| LED | Red LED (PA0) = heartbeat (1 Hz = firmware running) |
-| Button | PC13 = manual snapshot trigger |
+| LED (heartbeat) | Red LED PB14 — 1 Hz blink = firmware running |
+| Push button | PC13 — manual snapshot trigger |
+
+**Memory layout**
+
+| Region | Size | Content |
+|--------|------|---------|
+| RAM_D1 | 512 KB | Frame buffer (255 KB) + CV binary buffer (128 KB) |
+| RAM_D2 | 288 KB | CV temp buffer (128 KB) + CV background buffer (128 KB) |
+| RAM_D3 | 64 KB | TinyML activation buffer (40 KB) |
+| Flash | ~285 KB | X-CUBE-AI runtime + network weights (214 KB) |
 
 ---
 
@@ -131,50 +164,45 @@ python GUI_App/app/src/main.py
 ```
 
 Connect to the correct COM port at **2 000 000 Baud**.  
-The green "STM32 ready" indicator appears after the first valid protocol line is received.
+The "STM32 ready" indicator appears after `OV2640 ready` is received.
 
-**Basic workflow:**
+**Basic workflow**
 
-| Step | GUI action | UART command sent |
-|------|-----------|-------------------|
-| Capture frame | Mode = RGB → **SNAP** | `SNAP` |
-| Run CV | **Run STM32 CV** | `CV RUN` |
-| Run TinyML | **Run STM32 TinyML** | `TM RUN` |
-| Save frame | **Save Frame…** | — |
-| Benchmark | **Add Current Run** | — |
-| Export data | **Export CSV** | — |
+| Step | GUI action | UART command |
+|------|-----------|--------------|
+| 1 | Mode = RGB → **SNAP** | `MODE RGB` + `SNAP` |
+| 2 | **Run STM32 CV** | `CV RUN` |
+| 3 | **Run STM32 TinyML** | `TM RUN` |
+| 4 | Set GT Count → **Add Run** | — |
+| 5 | **Export CSV** | — |
 
-> **Important:** CV RUN and TM RUN always operate on the *last captured* RGB565 frame.  
-> For a fair benchmark, always SNAP once, then run CV RUN and TM RUN on the same frame.
+> CV RUN and TM RUN always operate on the **last captured** RGB565 frame.
 
 ---
 
 ## Quick start — ML training
 
 ```bash
-# 1. Clone the ST Model Zoo into ML training/Model/ (required once)
+# 1. Validate dataset
+python "ML training/src/check_dataset.py" --root "ML training/dataset"
+
+# 2. Edit ML training/Model/image_classification/user_config.yaml
+#    Set training_path, validation_path, quantization_path to absolute paths
+
+# 3. Clone ST Model Zoo (once)
 cd "ML training/Model"
 git clone https://github.com/STMicroelectronics/stm32ai-modelzoo-services
 pip install -e stm32ai-modelzoo-services
-cd ../..
 
-# 2. Validate your dataset
-python "ML training/src/check_dataset.py" --root "ML training/dataset"
-
-# 3. Edit ML training/Model/image_classification/user_config.yaml
-#    Update training_path, validation_path, quantization_path with absolute paths
-
-# 4. Train + quantise + evaluate (chain_tqe)
-cd "ML training/Model/stm32ai-modelzoo-services/image_classification/tf"
+# 4. Train + quantise (chain_tqe)
+cd stm32ai-modelzoo-services/image_classification/tf
 python stm32ai_main.py \
     --config-path ../../../image_classification \
     --config-name user_config.yaml
 
-# Output: experiments_outputs/<timestamp>/quantized_models/quantized_model.tflite
-
-# 5. Verify on a saved frame (from project root)
+# 5. Verify on PC
 python "ML training/src/predict_count_tflite.py" \
-    --model path/to/quantized_model.tflite \
+    --model "ML training/Model/quantized_model.tflite" \
     --image path/to/frame.png \
     --show-hash
 ```
@@ -185,80 +213,157 @@ python "ML training/src/predict_count_tflite.py" \
 
 | Field | Value |
 |-------|-------|
-| Architecture | MobileNetV1 α=0.25 |
+| Architecture | MobileNetV1 α=0.25, depthwise separable convolutions |
 | Input shape | **96 × 96 × 3** (H × W × C) |
 | Colour space | **RGB** (3 channels) |
 | Input dtype | **uint8 \[0…255\]** |
-| Resize method | **Nearest-neighbour, full-frame stretch** (no padding, no letterbox) |
-| Quantisation | PTQ, `QLinear(scale=1/127.5, zero_point=127)` |
+| Quantisation | Post-training, `QLinear(scale=1/127.5, zero_point=127)` |
 | Output | float32 \[5\], Softmax probabilities |
 | Classes | `count_0`, `count_1`, `count_2`, `count_3`, `count_4` |
-| Activation RAM | ≈ 41 KB |
-| Weight Flash | ≈ 215 KB |
+| Parameters | 211,621 |
+| MACC (ops) | **7,550,858** |
+| Weights — Flash | **219,844 B (214.7 KiB)** |
+| Activations — RAM | **41,152 B (40.2 KiB)** |
+| Total Flash (incl. runtime) | **285,351 B (~279 KB)** |
+| Total RAM (incl. runtime) | **57,876 B (~57 KB)** |
+| Resize method | **Nearest-neighbour, full-frame stretch** (no padding, no letterbox) |
 
-### ⚠ Preprocessing contract — read before retraining
+### ⚠ Preprocessing contract — must match firmware
 
-The STM32 firmware (`tinyml_preprocess.c`) maps each output pixel as:
+The STM32 firmware (`tinyml_preprocess.c`) maps each pixel with integer-floor nearest-neighbour:
 
 ```c
-sx = ox * src_width  / 96   // integer-floor, full-frame stretch
-sy = oy * src_height / 96
+sx = ox * src_width  / 96;   // integer floor — no rounding
+sy = oy * src_height / 96;
 ```
 
 `user_config.yaml` **must** set:
 
 ```yaml
-resizing:
-  interpolation: nearest
-  aspect_ratio: stretch     # NOT "fit" — "fit" adds letterboxing the firmware never replicates
-color_mode: rgb             # NOT grayscale — model expects 3 channels
+preprocessing:
+  resizing:
+    interpolation: nearest
+    aspect_ratio: stretch     # NOT "fit" — adds letterboxing firmware never replicates
+  color_mode: rgb             # NOT grayscale — model expects 3 channels
 ```
 
-Setting `aspect_ratio: fit` introduces black borders during training that the firmware never produces → domain shift → wrong predictions.
+### ❌ Common misconfigurations
 
-### ❌ Removed from older versions
-
-The following settings appeared in earlier project files and are **no longer valid**:
-
-| Old value | Correct value | Impact if not corrected |
-|-----------|--------------|------------------------|
+| Wrong value | Correct value | Impact |
+|-------------|--------------|--------|
 | `input_shape: (48, 48, 1)` | `(96, 96, 3)` | Wrong model size |
 | `color_mode: grayscale` | `rgb` | 1-channel vs 3-channel mismatch |
-| `aspect_ratio: fit` | `stretch` | Domain shift, wrong predictions |
+| `aspect_ratio: fit` | `stretch` | Black-border domain shift |
 | `board: STM32H747I-DISCO` | `NUCLEO-H7` | Wrong benchmarking target |
-| `quantization_path:` (empty) | set to training path | Poor PTQ calibration |
+
+---
+
+## Training results
+
+**Run:** `2026_05_03_09_11_10` — ST Model Zoo `chain_tqe` (train → quantise → evaluate)
+
+| Metric | Value |
+|--------|-------|
+| Best validation accuracy | **97.14 %** (epoch 35, 43, 44) |
+| Best training accuracy | **99.93 %** (epoch 34) |
+| Final validation accuracy | **94.29 %** (epoch 55) |
+| Training epochs | 55 |
+| LR schedule | 1e-3 → 5e-4 (ep 30) → 2.5e-4 (ep 44) → 1.25e-4 (ep 52) |
+| Framework | TensorFlow 2 / Keras, ST Model Zoo |
+
+![Training curves](ML%20training/Model/2026_05_03_09_11_10/Training_curves.png)
+
+> Training on real OV2640 frames captured with the Dataset Capture tool.  
+> The preprocessing pipeline (nearest-floor resize, full-frame stretch, RGB) exactly mirrors the STM32 firmware.
+
+**X-CUBE-AI analysis summary** (`network_generate_report.txt`)
+
+| Layer type | Count | % of MACC |
+|------------|-------|-----------|
+| Conv2D (standard + depthwise) | 27 + 14 = 41 | 99.3 % |
+| GlobalAvgPool + Dense + Softmax | 3 | 0.05 % |
+| Input conversion (u8→s8) | 1 | 0.7 % |
+
+---
+
+## CV pipeline
+
+```mermaid
+flowchart TD
+    A["RGB565 Frame\n(up to 480×272)"] --> B["Stage 1\nRGB565 → Grayscale\nBT.601 luma"]
+    B --> C{"BG subtraction\nenabled?"}
+    C -- yes --> D["Stage 2\nAbsolute diff\nvs reference frame"]
+    C -- no --> E
+    D --> E["Stage 3\nSpatial filter\nBox / Median (k=3…15)"]
+    E --> F["Stage 4\nThreshold\nManual or Otsu"]
+    F --> G["Stage 5\nMorphology\nOpen / Close / Erode / Dilate"]
+    G --> H["Stage 6\nRun-length CCL\n+ Union-Find\n(4 or 8 connectivity)"]
+    H --> I["Stage 7\nObject filter\nArea · Aspect ratio\nCircularity · Border"]
+    I --> J["CVSTAT + CVBOX\n→ UART → GUI"]
+```
+
+**CV command reference**
+
+| Command | Effect |
+|---------|--------|
+| `CV RUN` | Run full pipeline on last RGB565 frame |
+| `CV GET` | Send current config (CVCFG) |
+| `CV EN 0\|1` | Disable / enable CV engine |
+| `CV PRESET 0..3` | CUSTOM / FAST / ROBUST / ACCURATE |
+| `CV THRMODE 0\|1` | Manual / Otsu auto-threshold |
+| `CV THR 0..255` | Manual threshold value |
+| `CV INV 0\|1` | Invert binary image |
+| `CV FILTER 0..2` | OFF / BOX / MEDIAN |
+| `CV BLUR 0..7` | Pre-threshold blur kernel (0=off, 1→3×3 … 7→15×15) |
+| `CV MORPHMODE 0..4` | OFF / OPEN / CLOSE / ERODE / DILATE |
+| `CV MORPH 0..7` | Morphology kernel size |
+| `CV CON 4\|8` | CCL connectivity |
+| `CV MINAREA n` | Minimum object area (px²) |
+| `CV MAXAREA n` | Maximum object area (0=unlimited) |
+| `CV ASPECT min max` | Aspect ratio filter (×1000) |
+| `CV CIRC min` | Circularity minimum (×1000, 1000=circle) |
+| `CV BGCAP` | Capture current frame as background |
+| `CV BGSUB 0\|1` | Enable background subtraction |
+| `CV BORDFILT 0\|1` | Reject border-touching blobs |
+| `CV ROI 1 x y w h` | Set region of interest |
+| `CV ROI 0` | Disable ROI |
 
 ---
 
 ## UART protocol
 
-**Connection:** USART3, 2 000 000 Baud, 8N1, no flow control
+**Connection:** USART3, **2 000 000 Baud, 8N1**, no flow control
 
-### Frame transfer headers (binary payload follows immediately)
+### Frame transfer headers (raw bytes follow immediately after `\r\n`)
 
 ```
 JPG: <bytes>
 RGB565: <width> <height> <bytes>
+GRAY: <width> <height> <bytes>
 ```
 
-### Status lines
+### Status / log lines
 
 ```
-INFO: <message>
-WARN: <message>
-ERR:  <message>
-STAT: FPS=X.X SIZE=XB HEAP=XKB FB=XKB LAT=Xms
+INFO:  <message>
+WARN:  <message>
+ERR:   <message>
+DEBUG: <message>
+STAT:  FPS=X.X SIZE=XB HEAP=XKB FB=XKB LAT=Xms
 ```
 
-### Classical Vision
+### Classical Vision (CV)
 
 ```
-CVCFG: EN=1 THR=128 THRMODE=0 INV=0 BLUR=0 FILTER=0 MORPH=0
-       MORPHMODE=0 CON=8 MIN=20 MAX=0 ARMIN=0 ARMAX=0
-       CIRCMIN=0 ROIEN=0 ROIX=0 ROIY=0 ROIW=0 ROIH=0
+CVCFG: EN=1 PRESET=0 THR=128 THRMODE=0 INV=0
+       BLUR=0 FILTER=0 MORPH=0 MORPHMODE=0 CON=8
+       MIN=50 MAX=0 ARMIN=0 ARMAX=0 CIRCMIN=0
+       BORDFILT=1 BGSUB=0 BGCAP=0
+       ROIEN=0 ROIX=0 ROIY=0 ROIW=0 ROIH=0
 
 CVSTAT: COUNT=N MEAN=X MAX=X MIN=X BRIGHT=X TIME=Xms
-        REJSMALL=X REJLARGE=X BOXES=N
+        REJSMALL=X REJLARGE=X REJBORDER=X REJSHAPE=X
+        FGPIX=X RAWCOMP=X BOXES=N
 CVBOX:  ID=N AREA=X X=X Y=X W=X H=X PERI=X CIRC=X
 CVDONE
 ```
@@ -266,51 +371,43 @@ CVDONE
 ### TinyML
 
 ```
-TMCFG:  EN=1 INPUT=96x96x3 CLASSES=5 MODEL=mobilenetv1_a025
-TMINFO: STATUS=XCUBEAI_OK RAM=41KB FLASH=215KB
+TMCFG:  EN=1 INPUT=96x96x3 CLASSES=5 MODEL=quantized_model
+TMINFO: STATUS=XCUBEAI_OK RAM=40KB FLASH=215KB
 TMRES:  CLASS=count_N IDX=N CONF=XXX TIME=Xms UNCERTAIN=0
 TMPROB: IDX=N NAME=COUNT_N SCORE=XXX
 TMDONE
 ```
 
-`CONF` carries the confidence in permille (0…1000); the GUI normalises it to 0.0–1.0.  
-When `UNCERTAIN=1`, `CLASS=UNCERTAIN` and the GUI must not display the class as a real prediction.
+> `CONF` and `SCORE` are in **permille (0…1000)**. The GUI normalises to 0.0–1.0.  
+> When `UNCERTAIN=1`, `CLASS=UNCERTAIN` — the GUI marks it as uncertain, not a real class.
 
-### CV commands
-
-| Command | Effect |
-|---------|--------|
-| `CV RUN` | Run CV on last RGB565 frame |
-| `CV THRMODE 0` | Manual threshold |
-| `CV THRMODE 1` | Otsu auto-threshold ← recommended for benchmarking |
-| `CV THR <0..255>` | Set manual threshold |
-| `CV INV 0\|1` | Invert binary image |
-| `CV BLUR <0..7>` | Pre-threshold blur kernel |
-| `CV MORPH <0..7>` | Morphology kernel |
-| `CV MORPHMODE 0..4` | OFF / OPEN / CLOSE / ERODE / DILATE |
-| `CV MINAREA <n>` | Minimum object area (px²) |
-| `CV ROI 1 x y w h` | Enable ROI |
-| `CV GET` | Request current config |
-
-### TinyML commands
+**TinyML commands**
 
 | Command | Effect |
 |---------|--------|
-| `TM RUN` | Inference on last RGB565 frame |
-| `TM GET` | Request config + info |
+| `TM RUN` | Run inference on last RGB565 frame |
+| `TM GET` | Request TMCFG + TMINFO |
 | `TM EN 0\|1` | Enable / disable TinyML |
 
 ---
 
 ## Dataset capture workflow
 
-1. Connect STM32 → GUI.
-2. Select **Mode = RGB**, click **SNAP**.
-3. Check the camera preview — adjust lighting if needed.
-4. Click **Dataset Capture…** and select the target class (`count_0`…`count_4`).
-5. Repeat for all classes with at least **50 images per class** in `train/` and **10 in `val/`**.
+```mermaid
+flowchart LR
+    A["Dashboard\nDataset tab"] -->|"Mode=RGB\nSNAP"| B["OV2640\nQVGA 320×240"]
+    B -->|"RGB565 over UART"| C["GUI saves\n.png to disk"]
+    C --> D["train/count_N/\nval/count_N/"]
+    D --> E["check_dataset.py\nvalidate structure"]
+    E --> F["Training pipeline\nuser_config.yaml"]
+    F --> G["quantized_model.tflite\n→ X-CUBE-AI → STM32"]
+```
 
-Every saved PNG is a 320×240 RGB image from the actual OV2640 pipeline — the exact same data the firmware uses for inference.
+1. Connect STM32 → GUI → Dataset tab.
+2. Select **split** (`train` / `val`) and **label** (`count_0`…`count_4`).
+3. Click **Capture N frames** — the GUI automatically snaps and saves.
+4. Collect **≥ 50 training** and **≥ 10 validation** images per class.
+5. All PNGs are 320×240 RGB — identical to firmware inference input.
 
 ---
 
@@ -322,67 +419,81 @@ Every saved PNG is a 320×240 RGB image from the actual OV2640 pipeline — the 
 python "ML training/src/check_dataset.py" --root "ML training/dataset"
 ```
 
-### 2. Configure
-
-Edit `ML training/Model/image_classification/user_config.yaml`:
+### 2. Configure `user_config.yaml`
 
 ```yaml
 dataset:
-  # Replace with your local absolute paths:
-  training_path:   "/path/to/STM32_MERO2/ML training/dataset/train"
-  validation_path: "/path/to/STM32_MERO2/ML training/dataset/val"
-  quantization_path: "/path/to/STM32_MERO2/ML training/dataset/train"
+  training_path:     "/abs/path/to/dataset/train"
+  validation_path:   "/abs/path/to/dataset/val"
+  quantization_path: "/abs/path/to/dataset/train"
 
 preprocessing:
   resizing:
     interpolation: nearest
-    aspect_ratio: stretch   # critical — must match firmware
-  color_mode: rgb
+    aspect_ratio: stretch    # ← critical
+  color_mode: rgb            # ← critical
+
+model:
+  name: mobilenet
+  alpha: 0.25
+
+training:
+  epochs: 60
+  batch_size: 32
 ```
 
-### 3. Train
+### 3. Train (ST Model Zoo)
 
 ```bash
 cd "ML training/Model/stm32ai-modelzoo-services/image_classification/tf"
-python stm32ai_main.py --config-path ../../../image_classification --config-name user_config.yaml
+python stm32ai_main.py \
+    --config-path ../../../image_classification \
+    --config-name user_config.yaml
 ```
 
 Output: `experiments_outputs/<timestamp>/quantized_models/quantized_model.tflite`
 
-### 4. Verify on PC
+### 4. Verify preprocessing parity on PC
 
 ```bash
 python "ML training/src/predict_count_tflite.py" \
-    --model quantized_model.tflite \
-    --image "GUI_App/outputs/frames/frame_latest.png" \
-    --show-hash
+    --model "ML training/Model/quantized_model.tflite" \
+    --image path/to/frame.png --show-hash
 ```
 
-Compare the printed `hash=XXXXXXXX` with the STM32 `TM_IN: hash=...` log.  
-**Identical hash = identical preprocessing pipeline.**
+Compare `hash=XXXXXXXX` with STM32 log `TM_IN: hash=...` — **identical hash = identical pipeline**.
 
 ---
 
 ## STM32 deployment (X-CUBE-AI)
 
+```mermaid
+flowchart LR
+    A["quantized_model.tflite"] --> B["STM32CubeMX\nX-CUBE-AI → Import"]
+    B --> C["Analyse\nverify input/output shapes"]
+    C --> D["Generate Code\n→ network.c / network_data.c"]
+    D --> E["STM32CubeIDE\nRebuild + Flash"]
+    E --> F["STM32 running\nnew model"]
+```
+
 1. Open **STM32CubeMX** → X-CUBE-AI → Import `quantized_model.tflite`.
 2. Click **Analyse** — verify:
-   - Input: `uint8(1×96×96×3)`, `QLinear(0.00784, 127)`
+   - Input: `uint8(1×96×96×3)` — `QLinear(0.00784, 127)`
    - Output: `float32(1×5)`
-   - Activations ≈ 41 KB, Weights ≈ 215 KB
+   - Activations: **40.2 KiB**, Weights: **214.7 KiB**
 3. **Generate Code** → rebuild in STM32CubeIDE.
-4. **No changes** to `tinyml_engine.c` are needed after regeneration.
+4. `tinyml_engine.c` requires **no changes** after regeneration.
 
 ### X-CUBE-AI v10.2 — two mandatory lines in `tinyml_init()`
 
 ```c
-// Required: initialise STAI runtime before any network call.
-// Without this, ai_network_run() always produces constant outputs.
+// 1. Initialise STAI runtime before any network call.
+//    Without this, ai_network_run() always produces constant outputs.
 stai_runtime_init();
 
-// Required: pass NULL for weights.
-// ai_network_data_params_get() sets the correct Flash pointer internally.
-// Passing g_network_weights_table overrides it with the wrong address.
+// 2. Pass NULL for weights — ai_network_data_params_get() sets the
+//    correct Flash pointer internally. Passing the weights table directly
+//    overrides it with the wrong address.
 ai_network_create_and_init(&g_network, activations, NULL);
 ```
 
@@ -390,15 +501,22 @@ ai_network_create_and_init(&g_network, activations, NULL);
 
 ## Benchmarking
 
-For a **reproducible, fair CV vs TinyML comparison**:
+For a **reproducible CV vs TinyML comparison**:
 
-1. `SNAP` — capture one RGB565 frame.
-2. `CV THRMODE 1` + `CV RUN` — Otsu auto-threshold, no manual tuning needed.
+1. `SNAP` — capture one RGB565/QVGA frame.
+2. `CV THRMODE 1` + `CV RUN` — Otsu auto-threshold (no manual tuning).
 3. `TM RUN` — inference on the **same frame** (no new SNAP).
-4. Verify both used the same buffer: `TMDEBUG: FBADDR=0x...` must match the frame address.
-5. Set **GT Count** in the GUI, click **Add Current Run**.
-6. Repeat for scenes with 0, 1, 2, 3, 4 objects.
-7. **Export CSV** → analyse accuracy and timing.
+4. Set **GT Count** in the GUI → **Add Current Run**.
+5. Repeat for scenes with 0, 1, 2, 3, 4 objects.
+6. **Export CSV** → analyse accuracy, timing, uncertain predictions.
+
+**Expected performance on STM32H743 @ 480 MHz**
+
+| Operation | Typical latency |
+|-----------|----------------|
+| SNAP (QVGA RGB565) | ~150–250 ms |
+| CV RUN (ROBUST preset, QVGA) | ~15–40 ms |
+| TM RUN (QVGA → 96×96 preprocess + inference) | ~120–200 ms |
 
 ---
 
@@ -406,14 +524,16 @@ For a **reproducible, fair CV vs TinyML comparison**:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| TM_RAW_OUT always `[0.5, 0.5, 0, 0, 0]` | `stai_runtime_init()` not called | Add before `ai_network_create_and_init()` |
-| TM_RAW_OUT constant for all inputs | `weights=g_network_weights_table` | Pass `NULL` as weights |
-| PC hash ≠ STM32 hash | Preprocessing mismatch | Check `aspect_ratio: stretch`, `color_mode: rgb`, `BYTESWAP=0` |
-| All predictions = count_0 | Domain shift | Retrain with real OV2640 frames from Dataset Capture |
-| UNCERTAIN on all frames | Low confidence | Lower `TINYML_UNCERTAIN_THRESHOLD_PERMILLE` or retrain |
-| Red LED not blinking | Firmware not running / scheduler not started | Check build, power, ST-LINK connection |
-| GUI shows no frames | Wrong COM port or baud rate | Verify 2 000 000 Baud, STM32 firmware flashed |
-| Build error: missing `stai.h` | X-CUBE-AI files not generated | Re-run CubeMX code generation |
+| `TM_RAW_OUT` always `[0.5, 0.5, 0, 0, 0]` | `stai_runtime_init()` not called | Add before `ai_network_create_and_init()` |
+| Constant output for all inputs | `weights=g_network_weights_table` | Pass `NULL` as weights argument |
+| PC hash ≠ STM32 hash | Preprocessing mismatch | Check `aspect_ratio: stretch`, `color_mode: rgb`, `TINYML_PREPROCESS_BYTESWAP=0` |
+| All predictions = count_0 | Domain shift (wrong train data) | Retrain with real OV2640 frames via Dataset Capture |
+| `UNCERTAIN` on all frames | Confidence below threshold | Lower `TINYML_UNCERTAIN_THRESHOLD_PERMILLE` or retrain |
+| Red LED not blinking | Firmware not running | Check build, power, ST-LINK |
+| GUI shows no frames | Wrong port or baud | Verify 2 000 000 Baud, firmware flashed |
+| CV returns 0 objects | Wrong threshold or too small area | Use Otsu mode; lower `CV MINAREA` |
+| `CV RUN` error: "needs RGB565 frame" | JPEG mode active | Switch to RGB mode, press SNAP first |
+| Build error: missing `stai.h` | X-CUBE-AI not generated | Re-run CubeMX code generation |
 
 ---
 
@@ -433,8 +553,6 @@ omegaconf>=2.3.0
 tqdm>=4.66.0
 ```
 
-Install everything with:
-
 ```bash
 pip install -r requirements.txt
 ```
@@ -444,7 +562,7 @@ pip install -r requirements.txt
 ## Contributors
 
 | Name | Role |
-|---|---|
+|------|------|
 | Mutasem Bader | STM32 firmware (FreeRTOS, DCMI/DMA, CV engine, TinyML, UART protocol), Python GUI dashboard, ML training pipeline, system integration |
 
 ---
