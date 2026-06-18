@@ -6,8 +6,11 @@
  *
  * Architecture notes:
  *   - The stream task and the command handler share app->stream_enable.
- *     uart_tx_send_bin() uses a task-notification handshake internally;
- *     the caller must NOT wait on ulTaskNotifyTake() afterwards.
+ *     After uart_tx_send_bin(), the stream task calls ulTaskNotifyTake()
+ *     to block until uart_tx_task notifies it via xTaskNotifyGive().
+ *     This ensures frame_buf is not reclaimed by DCMI DMA before the
+ *     UART TX DMA has finished reading it.  STREAM_EV_START/STOP are
+ *     event-group bits and are unaffected by ulTaskNotifyTake().
  *   - All CV sub-commands are dispatched through handle_cv() (single path).
  *   - BGCAP converts RGB565 → grayscale via cv_capture_background(); a
  *     raw memcpy would copy 2-byte pixels into a 1-byte-per-pixel buffer.
@@ -519,16 +522,18 @@ void camera_stream_task(void *arg)
                     snprintf(hdr, sizeof(hdr),
                              "JPG: %lu\r\n", (unsigned long)jpeg_len);
                     (void)uart_tx_send_text(app->uart, hdr);
-                    /*
-                     * uart_tx_send_bin() already waits internally for DMA
-                     * TX completion via task notification.  Do NOT call
-                     * ulTaskNotifyTake() here — it would consume the next
-                     * STREAM_EV_START notification and exit the loop.
-                     */
                     (void)uart_tx_send_bin(app->uart,
                                            app->frame_buf + jpeg_off,
                                            jpeg_len,
                                            app->stream_task);
+                    /*
+                     * Wait for UART TX to finish before DCMI DMA restarts
+                     * into frame_buf.  uart_tx_task calls xTaskNotifyGive
+                     * (stream_task) after the last chunk — this is a task
+                     * notification, completely independent of the event-group
+                     * bits used for STREAM_EV_START / STREAM_EV_STOP.
+                     */
+                    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10000u));
                     camproto_send_status(app);
                 } else {
                     uint16_t w = 0u, h = 0u;
@@ -543,6 +548,7 @@ void camera_stream_task(void *arg)
                     (void)uart_tx_send_text(app->uart, hdr);
                     (void)uart_tx_send_bin(app->uart, app->frame_buf,
                                            bytes, app->stream_task);
+                    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10000u));
                     camproto_send_status(app);
                 }
 
