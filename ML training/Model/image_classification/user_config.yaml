@@ -1,0 +1,120 @@
+general:
+  project_name: stm32_edge_vision_counting
+  logs_dir: logs
+  saved_models_dir: saved_models
+  display_figures: False
+  global_seed: 42
+  gpu_memory_limit: 4
+
+operation_mode: chain_tqe
+
+model:
+  model_path:
+  model_name: mobilenetv1_a025
+  model_type:
+  input_shape: [96, 96, 3]      # H x W x C — matches STM32 preprocessing (96x96x3 RGB uint8)
+  pretrained: False             # Train from scratch — no ImageNet bias for chip counting
+
+dataset:
+  dataset_name: custom_dataset
+  class_names: [count_0, count_1, count_2, count_3, count_4]
+  # Set these to absolute paths pointing to your local dataset clone.
+  # Example (Windows):   "C:/Users/<you>/STM32_MERO2/ML training/dataset/train"
+  # Example (Linux/Mac): "/home/<you>/STM32_MERO2/ML training/dataset/train"
+  training_path:   ""        # REQUIRED — set before running training
+  validation_path: ""        # REQUIRED — set before running training
+  validation_split:
+  test_path:
+  # Point to a representative subset of REAL OV2640 frames for PTQ calibration.
+  # Using training data as fallback is acceptable but may produce suboptimal scales.
+  quantization_path: ""      # REQUIRED — set to training_path or a calibration subset
+  quantization_split: 0.2      # 20% of training set used for calibration
+  check_image_files: False
+  seed: 42
+
+preprocessing:
+  # rescaling is the float normalisation applied during training.
+  # The quantized model (uint8 input, QLinear scale=1/127.5, zero_point=127)
+  # embeds this normalisation in the first Conv2D layer.
+  # The STM32 firmware sends raw uint8 [0..255] — X-CUBE-AI handles the rest.
+  rescaling: { scale: 1/127.5, offset: -1 }
+  resizing:
+    interpolation: nearest     # Must match STM32 tinyml_preprocess.c (integer-floor NN)
+    # IMPORTANT: aspect_ratio MUST be "stretch" (not "fit") to match the STM32
+    # firmware which does full-frame stretch (320x240 -> 96x96 without padding).
+    # "fit" would add letterboxing during training that the firmware does not replicate.
+    aspect_ratio: stretch
+  color_mode: rgb              # 3-channel RGB — matches TINYML_INPUT_CHANNELS = 3
+
+data_augmentation:
+  random_contrast:
+    factor: 0.4
+  random_brightness:
+    factor: 0.2
+  random_flip:
+    mode: horizontal_and_vertical
+  random_rotation:
+    factor: 0.15
+    fill_mode: reflect
+    interpolation: nearest
+  random_zoom:
+    width_factor: 0.2
+    height_factor: 0.2
+    fill_mode: reflect
+    interpolation: nearest
+
+training:
+  frozen_layers: None
+  resume_training:
+  dropout: 0.3
+  batch_size: 16
+  epochs: 100
+  optimizer:
+    Adam:
+      learning_rate: 0.001
+  callbacks:
+    ReduceLROnPlateau:
+      monitor: val_accuracy
+      mode: max
+      factor: 0.5
+      patience: 8
+      min_lr: 1.0e-06
+    EarlyStopping:
+      monitor: val_accuracy
+      mode: max
+      restore_best_weights: true
+      patience: 20
+
+quantization:
+  quantizer: TFlite_converter
+  quantization_type: PTQ
+  quantization_input_type: uint8    # Matches AI_BUFFER_FORMAT_U8 in X-CUBE-AI
+  quantization_output_type: float   # Runtime dequantizes to float32 for output
+  granularity: per_channel
+  optimize: False
+  export_dir: quantized_models
+
+tools:
+  stedgeai:
+    optimization: balanced
+    on_cloud: False
+    path_to_stedgeai: ""    # Set to your STEdgeAI install, e.g. C:/ST/STEdgeAI/stedgeai.exe
+  path_to_cubeIDE: ""       # Set to your STM32CubeIDE install path
+
+benchmarking:
+  board: NUCLEO-H743ZI2
+
+deployment:
+  c_project_path:
+  IDE: GCC
+  verbosity: 1
+  hardware_setup:
+    serie: STM32H7
+    board: STM32H743ZI2
+
+mlflow:
+  uri: ./tf/src/experiments_outputs/mlruns
+
+hydra:
+  run:
+    dir: ./tf/src/experiments_outputs/${now:%Y_%m_%d_%H_%M_%S}

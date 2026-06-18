@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# PyInstaller
+build/*
+!build/.gitkeep
+dist/*
+!dist/.gitkeep
+
+# Runtime outputs
+outputs/logs/*
+outputs/frames/*
+outputs/debug_images/*
+outputs/benchmark/*
+outputs/dataset/*
+!outputs/**/.gitkeep
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
