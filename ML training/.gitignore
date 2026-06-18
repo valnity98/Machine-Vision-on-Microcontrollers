@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Training outputs
+artifacts/*.keras
+artifacts/*.tflite
+artifacts/saved_model/
+artifacts/preprocessed_preview/
+artifacts/*.csv
+artifacts/*.txt
+artifacts/*.json
+outputs/
+
+# Dataset images are large — store locally or use Git LFS.
+# Remove these lines only if you intentionally want to version images.
+dataset/
+# ST Model Zoo (cloned separately — not part of this repo)
+Model/stm32ai-modelzoo-services/
+# Hydra / MLflow experiment outputs
+Model/image_classification/logs/
+Model/image_classification/saved_models/
+Model/image_classification/tf/src/experiments_outputs/
