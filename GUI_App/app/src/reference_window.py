@@ -167,8 +167,8 @@ class ReferenceWindowController(
         self._current_image_index:  int         = 0
 
         # ── Dataset capture state ─────────────────────────────────────────
-        # Default dataset root falls back to <outputs>/dataset on all platforms.
-        self._dataset_default_root = self._output_dir("dataset")
+        # Default dataset root: ML training/dataset at the repo root (3 levels above src/).
+        self._dataset_default_root = self._project_root.parents[2] / "ML training" / "dataset"
         self._dataset_timer         = QTimer(self.window)
         self._dataset_timer.setSingleShot(True)
         self._dataset_timer.timeout.connect(self._dataset_next_capture)

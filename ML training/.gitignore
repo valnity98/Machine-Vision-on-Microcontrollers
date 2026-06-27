@@ -23,3 +23,7 @@ Model/stm32ai-modelzoo-services/
 Model/image_classification/logs/
 Model/image_classification/saved_models/
 Model/image_classification/tf/src/experiments_outputs/
+Model/stm32ai-modelzoo-services/image_classification/tf/src/experiments_outputs/
+Model/stm32ai-modelzoo-services/image_classification/logs/
+# Quantized model outputs (stored in experiments_outputs, not root)
+Model/*.tflite

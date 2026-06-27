@@ -21,13 +21,13 @@ dataset:
   # Set these to absolute paths pointing to your local dataset clone.
   # Example (Windows):   "C:/Users/<you>/STM32_MERO2/ML training/dataset/train"
   # Example (Linux/Mac): "/home/<you>/STM32_MERO2/ML training/dataset/train"
-  training_path:   ""        # REQUIRED — set before running training
-  validation_path: ""        # REQUIRED — set before running training
+  training_path:   "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/train"        # REQUIRED — set before running training
+  validation_path: "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/val"        # REQUIRED — set before running training
   validation_split:
   test_path:
   # Point to a representative subset of REAL OV2640 frames for PTQ calibration.
   # Using training data as fallback is acceptable but may produce suboptimal scales.
-  quantization_path: ""      # REQUIRED — set to training_path or a calibration subset
+  quantization_path: "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/train"       # REQUIRED — set to training_path or a calibration subset
   quantization_split: 0.2      # 20% of training set used for calibration
   check_image_files: False
   seed: 42
@@ -43,7 +43,7 @@ preprocessing:
     # IMPORTANT: aspect_ratio MUST be "stretch" (not "fit") to match the STM32
     # firmware which does full-frame stretch (320x240 -> 96x96 without padding).
     # "fit" would add letterboxing during training that the firmware does not replicate.
-    aspect_ratio: stretch
+    aspect_ratio: full_screen
   color_mode: rgb              # 3-channel RGB — matches TINYML_INPUT_CHANNELS = 3
 
 data_augmentation:
