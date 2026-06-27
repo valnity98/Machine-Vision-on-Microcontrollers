@@ -410,7 +410,7 @@
             </property>
             <layout class="QHBoxLayout" name="quickResultLayout">
              <property name="spacing">
-              <number>12</number>
+              <number>6</number>
              </property>
              <item>
               <widget class="QLabel" name="cvCountKeyLabel">

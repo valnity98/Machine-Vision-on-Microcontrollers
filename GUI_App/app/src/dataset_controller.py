@@ -51,10 +51,13 @@ class DatasetMixin:
         except Exception:
             existing = 0
         if status_lbl:
+            parts = Path(target).parts
+            short = "/".join(parts[-2:]) if len(parts) >= 2 else str(target)
             status_lbl.setText(
-                f"Target: {target}  |  Existing: {existing}  |  "
+                f"Target: …/{short}  |  Existing: {existing}  |  "
                 f"Saved: {self._dataset_saved_count}/{n}"
             )
+            status_lbl.setToolTip(str(target))
         self._update_dataset_baud_hint()
 
     def _update_dataset_baud_hint(self) -> None:

@@ -38,7 +38,7 @@ class DisplayMixin:
             lbl.setText("")
 
         if self._last_qimg is None or self._last_qimg.isNull():
-            self._w("imageLabel").setText("No frame — press SNAP")
+            self._w("imageLabel").setText("No frame — connect STM32 and press SNAP")
             self._w("imageLabel").setPixmap(QPixmap())
             return
 

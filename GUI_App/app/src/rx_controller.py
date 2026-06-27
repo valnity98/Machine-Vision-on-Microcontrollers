@@ -263,10 +263,9 @@ class RxMixin:
             self._tm_pending.ram_kb   = ram
             self._tm_pending.flash_kb = flash
             self._set_compact_label("mlRuntimeLabel",  status, max_chars=28)
-            self._set_compact_label(
-                "mlMemValueLabel",
-                f"RAM {ram} KB / Flash {flash} KB",
-                max_chars=40)
+            mem_lbl = self.window.findChild(object, "mlMemValueLabel")
+            if mem_lbl:
+                mem_lbl.setText(f"RAM {ram} KB / Flash {flash} KB")
             return
 
         if line.startswith("TMRES:"):

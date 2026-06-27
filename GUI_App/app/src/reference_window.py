@@ -202,7 +202,7 @@ class ReferenceWindowController(
         # Camera preview image label
         lbl = self._w("imageLabel")
         lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        lbl.setMinimumSize(440, 290)
+        lbl.setMinimumSize(320, 200)
         lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Baudrate combo default
@@ -276,6 +276,30 @@ class ReferenceWindowController(
             w = self.window.findChild(object, name)
             if w:
                 w.setEnabled(False)
+
+        # Constrain the Last Result Summary group box so it never forces the
+        # left column wider than the Camera Preview (max 640 px).  Without this
+        # the sum of all key+value labels pushes the group's preferred width to
+        # ~800 px, which compresses the right column and clips Mode_Resolution.
+        result_gb = self.window.findChild(object, "quickResultGroupBox")
+        if result_gb:
+            result_gb.setMaximumWidth(640)
+            layout = result_gb.layout()
+            if layout:
+                layout.setSpacing(6)
+
+        # Also cap individual value labels so elision kicks in for long strings.
+        for lbl_name, max_w in [
+            ("mlPredValueLabel",   100),
+            ("mlConfValueLabel",    95),
+            ("cvBoxesValueLabel",   80),
+            ("cvBrightValueLabel",  44),
+            ("cvTimeValueLabel",    60),
+            ("cvCountValueLabel",   60),
+        ]:
+            w = self.window.findChild(object, lbl_name)
+            if w:
+                w.setMaximumWidth(max_w)
 
         # Dataset UI defaults
         root_le = self.window.findChild(QLineEdit, "dsRootLineEdit")
@@ -504,7 +528,7 @@ class ReferenceWindowController(
             "btnApplyAllQuality", "btnResetQuality",
             # CV action buttons
             "cvBtnGet", "btnRunCV", "cvBtnBgCap",
-            "btnSnapAndRunCV", "btnSaveCVResult",
+            "btnSnapAndRunCV",
             # CV controls
             "cvEnableCheck", "cvPresetCombo",
             "cvOtsuCheck", "cvThrSlider",
@@ -518,15 +542,15 @@ class ReferenceWindowController(
             "cvBordFiltCheck",
             "cvRoiEnableCheck", "cvBtnSendRoi",
             # TinyML
-            "btnRunML", "btnSnapAndRunML", "btnSaveMLResult",
+            "btnRunML", "btnSnapAndRunML",
             "mlEnabledCheckBox", "btnTMGet",
             # Benchmark / save
-            "btnAddRun", "btnSaveFrame", "btnSaveDebugImages",
+            "btnAddRun",
         ):
             w = self.window.findChild(object, name)
             if w:
                 w.setEnabled(enabled)
-        for name in ("dsSaveButton", "dsCaptureButton", "dsStopButton"):
+        for name in ("dsCaptureButton", "dsStopButton"):
             w = self.window.findChild(object, name)
             if w:
                 w.setEnabled(enabled)
@@ -694,6 +718,13 @@ class ReferenceWindowController(
     def _build_cv_command_list(self) -> list:
         """Build the list of CV parameter commands + CV RUN."""
         cmds = []
+        # If a named preset is active, send only the preset command — sending
+        # individual params would cause the firmware to reset preset to CUSTOM.
+        preset_combo = self._cv_widget("cvPresetCombo")
+        if preset_combo and preset_combo.currentIndex() > 0:
+            cmds.append(f"CV PRESET {preset_combo.currentIndex()}")
+            cmds.append("CV RUN")
+            return cmds
         # Threshold mode + value
         otsu = self._cv_widget("cvOtsuCheck")
         if otsu and otsu.isChecked():

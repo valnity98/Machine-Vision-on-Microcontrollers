@@ -135,6 +135,16 @@ QPushButton#btnSaveDebugImages, QPushButton#btnSaveFrame,
 QPushButton#dsSaveButton {
     background: #f0fdf4; color: #166534; border-color: #86efac;
 }
+QPushButton#btnSaveCVResult:hover, QPushButton#btnSaveMLResult:hover,
+QPushButton#btnSaveDebugImages:hover, QPushButton#btnSaveFrame:hover,
+QPushButton#dsSaveButton:hover {
+    background: #dcfce7; border-color: #4ade80;
+}
+QPushButton#btnSaveCVResult:pressed, QPushButton#btnSaveMLResult:pressed,
+QPushButton#btnSaveDebugImages:pressed, QPushButton#btnSaveFrame:pressed,
+QPushButton#dsSaveButton:pressed {
+    background: #bbf7d0; border-color: #22c55e;
+}
 
 /* ── Inputs ── */
 QLineEdit, QPlainTextEdit, QComboBox, QSpinBox {
@@ -159,16 +169,22 @@ QLabel#binaryImageLabel, QLabel#overlayImageLabel {
 }
 
 /* ── Text roles ── */
-QLabel[role="key"]   { color: #334155; font-weight: 600; font-size: 9.5pt; }
-QLabel[role="value"] { color: #0f172a; font-weight: 500; }
-QLabel[role="hint"]  { color: #64748b; font-size: 9pt; }
+QLabel[role="key"]   { color: #64748b; font-weight: 600; font-size: 8.5pt; }
+QLabel[role="value"] { color: #1e40af; font-weight: 700; font-size: 10pt; }
+QLabel[role="hint"]  { color: #94a3b8; font-size: 8.5pt; }
 
 /* ── Status labels ── */
 QLabel#connStatusLabel[connected="true"]  { color: #059669; font-weight: 700; }
 QLabel#connStatusLabel[connected="false"] { color: #dc2626; font-weight: 700; }
-QLabel#cvCountValueLabel { color: #059669; font-weight: 800; font-size: 14pt; }
+/* CV count: bright green, larger */
+QLabel#cvCountValueLabel { color: #059669; font-weight: 800; font-size: 12pt; }
+/* ML prediction: amber, same size as other values */
 QLabel#mlPredValueLabel, QLabel#mlPredValueLabel2 {
-    color: #d97706; font-weight: 800;
+    color: #d97706; font-weight: 700; font-size: 10pt;
+}
+/* Confidence value: slightly muted teal to distinguish from count */
+QLabel#mlConfValueLabel, QLabel#mlConfValueLabel2 {
+    color: #0891b2; font-weight: 700; font-size: 10pt;
 }
 
 /* ── Mode status banner labels ── */
