@@ -43,7 +43,7 @@ preprocessing:
     # IMPORTANT: aspect_ratio MUST be "stretch" (not "fit") to match the STM32
     # firmware which does full-frame stretch (320x240 -> 96x96 without padding).
     # "fit" would add letterboxing during training that the firmware does not replicate.
-    aspect_ratio: full_screen
+    aspect_ratio: fit # full_screen
   color_mode: rgb              # 3-channel RGB — matches TINYML_INPUT_CHANNELS = 3
 
 data_augmentation:
