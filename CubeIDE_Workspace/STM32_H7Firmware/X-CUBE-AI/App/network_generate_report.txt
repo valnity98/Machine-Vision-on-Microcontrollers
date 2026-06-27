@@ -1,30 +1,30 @@
 ST Edge AI Core v2.2.0-20266 2adc00962
-Created date          : 2026-05-19 16:55:50
-Parameters            : generate --target stm32h7 --name network -m E:/Studium_Projekte/STM32_MERO2/ML training/Model/quantized_model.tflite --compression none --verbosity 1 --workspace C:/Users/MBade/AppData/Local/Temp/mxAI_workspace78491597470400654746382617829597 --output C:/Users/MBade/.stm32cubemx/network_output
+Created date          : 2026-06-27 20:35:42
+Parameters            : generate --target stm32h7 --name network -m C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/Model/stm32ai-modelzoo-services/image_classification/tf/src/experiments_outputs/2026_06_27_20_08_38/quantized_models/quantized_model.tflite --compression none --verbosity 1 --workspace C:/Users/MBade/AppData/Local/Temp/mxAI_workspace2060055784150018102518893671704640 --output C:/Users/MBade/.stm32cubemx/network_output
 
 Exec/report summary (generate)
--------------------------------------------------------------------------------------------------------------------------------------
-model file         :   E:\Studium_Projekte\STM32_MERO2\ML training\Model\quantized_model.tflite                                      
-type               :   tflite                                                                                                        
-c_name             :   network                                                                                                       
-compression        :   none                                                                                                          
-options            :   allocate-inputs, allocate-outputs                                                                             
-optimization       :   balanced                                                                                                      
-target/series      :   stm32h7                                                                                                       
-workspace dir      :   C:\Users\MBade\AppData\Local\Temp\mxAI_workspace78491597470400654746382617829597                              
-output dir         :   C:\Users\MBade\.stm32cubemx\network_output                                                                    
-model_fmt          :   sa/ua per tensor                                                                                              
-model_name         :   quantized_model                                                                                               
-model_hash         :   0x41bda13525d2b7a5ee9ab3f4ec24e701                                                                            
-params #           :   211,621 items (214.69 KiB)                                                                                    
--------------------------------------------------------------------------------------------------------------------------------------
-input 1/1          :   'serving_default_input_layer0', uint8(1x96x96x3), 27.00 KBytes, QLinear(0.007843138,127,uint8), activations   
-output 1/1         :   'conversion_31', f32(1x5), 20 Bytes, activations                                                              
-macc               :   7,550,858                                                                                                     
-weights (ro)       :   219,844 B (214.69 KiB) (1 segment) / -626,640(-74.0%) vs float model                                          
-activations (rw)   :   41,152 B (40.19 KiB) (1 segment) *                                                                            
-ram (total)        :   41,152 B (40.19 KiB) = 41,152 + 0 + 0                                                                         
--------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+model file         :   C:\Users\MBade\Documents\GitHub\Machine-Vision-on-Microcontrollers\ML training\Model\stm32ai-modelzoo-services\image_classification\tf\src\experiments_outputs\2026_06_27_20_08_38\quantized_models\quantized_model.tflite   
+type               :   tflite                                                                                                                                                                                                                       
+c_name             :   network                                                                                                                                                                                                                      
+compression        :   none                                                                                                                                                                                                                         
+options            :   allocate-inputs, allocate-outputs                                                                                                                                                                                            
+optimization       :   balanced                                                                                                                                                                                                                     
+target/series      :   stm32h7                                                                                                                                                                                                                      
+workspace dir      :   C:\Users\MBade\AppData\Local\Temp\mxAI_workspace2060055784150018102518893671704640                                                                                                                                           
+output dir         :   C:\Users\MBade\.stm32cubemx\network_output                                                                                                                                                                                   
+model_fmt          :   sa/ua per tensor                                                                                                                                                                                                             
+model_name         :   quantized_model                                                                                                                                                                                                              
+model_hash         :   0x31242ccf5b4a7e963d591155d9efe179                                                                                                                                                                                           
+params #           :   211,621 items (214.69 KiB)                                                                                                                                                                                                   
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+input 1/1          :   'serving_default_input_layer0', uint8(1x96x96x3), 27.00 KBytes, QLinear(0.007843138,127,uint8), activations                                                                                                                  
+output 1/1         :   'conversion_31', f32(1x5), 20 Bytes, activations                                                                                                                                                                             
+macc               :   7,550,858                                                                                                                                                                                                                    
+weights (ro)       :   219,844 B (214.69 KiB) (1 segment) / -626,640(-74.0%) vs float model                                                                                                                                                         
+activations (rw)   :   41,152 B (40.19 KiB) (1 segment) *                                                                                                                                                                                           
+ram (total)        :   41,152 B (40.19 KiB) = 41,152 + 0 + 0                                                                                                                                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 (*) 'input'/'output' buffers are allocated in the activations buffer
 
 Model name - quantized_model
@@ -276,7 +276,7 @@ c_id   name (*_array)                        item/size     domain/mem-pool      
 125    gemm_29_scratch0                      281/562       activations/**default**   s16                   
 126    gemm_29_weights                       1280/1280     weights/weights           const s8              
 127    nl_30_output                          5/5           activations/**default**   s8                    
-128    nl_30_scratch0                        124/496       activations/**default**   s32                   
+128    nl_30_scratch0                        248/992       activations/**default**   s32                   
 129    pool_28_output                        256/256       activations/**default**   s8                    
 130    serving_default_input_layer0_output   27648/27648   activations/**default**   u8          /input    
 ------ ------------------------------------- ------------- ------------------------- ----------- --------- 
@@ -613,17 +613,17 @@ macc=7,550,858 weights=219,844 act=41,152 ram_io=0
  module                             text    rodata     data      bss 
  ------------------------------ -------- --------- -------- -------- 
  NetworkRuntime1020_CM7_GCC.a     29,480         0        0        0 
- network.o                         2,592    15,707   15,960      676 
+ network.o                         2,596    15,707   15,960      676 
  network_data.o                       48        16       88        0 
  lib (toolchain)*                    988       624        0        0 
  ------------------------------ -------- --------- -------- -------- 
- RT total**                       33,108    16,347   16,048      676 
+ RT total**                       33,112    16,347   16,048      676 
  ------------------------------ -------- --------- -------- -------- 
  weights                               0   219,848        0        0 
  activations                           0         0        0   41,152 
  io                                    0         0        0        0 
  ------------------------------ -------- --------- -------- -------- 
- TOTAL                            33,108   236,195   16,048   41,828 
+ TOTAL                            33,112   236,195   16,048   41,828 
  ------------------------------ -------- --------- -------- -------- 
  *  toolchain objects (libm/libgcc*)
  ** RT AI runtime objects (kernels+infrastructure)
@@ -632,9 +632,9 @@ macc=7,550,858 weights=219,844 act=41,152 ram_io=0
   ---------------------------------------------------
                FLASH (ro)      %*   RAM (rw)       % 
   ---------------------------------------------------
-  RT total         65,503   23.0%     16,724   28.9% 
+  RT total         65,507   23.0%     16,724   28.9% 
   ---------------------------------------------------
-  TOTAL           285,351             57,876         
+  TOTAL           285,355             57,876         
   ---------------------------------------------------
   *  rt/total
 
