@@ -1438,7 +1438,18 @@
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QComboBox" name="dsLabelCombo"/>
+                 <widget class="QComboBox" name="dsLabelCombo">
+                  <item><property name="text"><string>count_0</string></property></item>
+                  <item><property name="text"><string>count_1</string></property></item>
+                  <item><property name="text"><string>count_2</string></property></item>
+                  <item><property name="text"><string>count_3</string></property></item>
+                  <item><property name="text"><string>count_4</string></property></item>
+                  <item><property name="text"><string>count_5</string></property></item>
+                  <item><property name="text"><string>count_6</string></property></item>
+                  <item><property name="text"><string>count_7</string></property></item>
+                  <item><property name="text"><string>count_8</string></property></item>
+                  <item><property name="text"><string>count_9</string></property></item>
+                 </widget>
                 </item>
 
                 <item row="2" column="0">
