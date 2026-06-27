@@ -9,6 +9,7 @@ Revised_Expose_STM32_Edge_Vision_counting.docx
 
 # ── STM32CubeIDE workspace metadata ──────────────────────────
 CubeIDE_Workspace/.metadata/
+CubeIDE_Workspace/workspace/
 CubeIDE_Workspace/**/.settings/
 CubeIDE_Workspace/**/Debug/
 CubeIDE_Workspace/**/Release/
