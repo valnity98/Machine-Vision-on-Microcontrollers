@@ -3,6 +3,17 @@
  *
  * RGB565 -> uint8 HWC tensor preprocessing for MobileNetV1 0.25.
  *
+ * Resize mode: full-frame stretch (no letterboxing).
+ * Every output pixel (ox, oy) maps to source pixel via integer-floor:
+ *   sx = ox * width  / 96
+ *   sy = oy * height / 96
+ * This matches predict_count_tflite.py on the PC side; the FNV-1a hash
+ * comparison verifies both use identical preprocessing.
+ *
+ * Note: the training config uses aspect_ratio: fit (letterboxing on 480x272
+ * training images). This creates a known preprocessing difference between
+ * training and inference, documented as a limitation in the thesis.
+ *
  * Byte-swap note:
  *   OV2640 outputs RGB565 big-endian over DCMI. The STM32 DMA stores pixels
  *   little-endian in memory. Reading frame_buf as uint16_t* on a little-endian

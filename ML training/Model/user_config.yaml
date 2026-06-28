@@ -40,10 +40,10 @@ preprocessing:
   rescaling: { scale: 1/127.5, offset: -1 }
   resizing:
     interpolation: nearest     # Must match STM32 tinyml_preprocess.c (integer-floor NN)
-    # IMPORTANT: aspect_ratio MUST be "stretch" (not "fit") to match the STM32
-    # firmware which does full-frame stretch (320x240 -> 96x96 without padding).
-    # "fit" would add letterboxing during training that the firmware does not replicate.
-    aspect_ratio: fit # full_screen
+    # aspect_ratio: fit = proportional scaling with letterboxing (black bars).
+    # Note: the firmware uses full-frame stretch (no letterboxing), which creates
+    # a known preprocessing difference between training and inference.
+    aspect_ratio: fit
   color_mode: rgb              # 3-channel RGB — matches TINYML_INPUT_CHANNELS = 3
 
 data_augmentation:

@@ -52,18 +52,15 @@ def preprocess_image(img: Image.Image) -> np.ndarray:
     Resize with nearest-neighbour (integer-floor mapping, full-frame stretch)
     and return a uint8 array of shape (1, 96, 96, 3).
 
-    This replicates the STM32 firmware behaviour:
+    This replicates the STM32 firmware behaviour (tinyml_preprocess.c):
       sx = ox * src_w // INPUT_W
       sy = oy * src_h // INPUT_H
-    PIL NEAREST with a plain resize achieves the same result for integer
-    downscaling from 320x240 -> 96x96.
     """
     src_w, src_h = img.size
     if img.mode != "RGB":
         img = img.convert("RGB")
 
-    # Replicate firmware integer-floor mapping
-    arr_src = np.array(img, dtype=np.uint8)  # [H, W, 3]
+    arr_src = np.array(img, dtype=np.uint8)
     arr_dst = np.zeros((INPUT_H, INPUT_W, INPUT_C), dtype=np.uint8)
     for oy in range(INPUT_H):
         for ox in range(INPUT_W):
