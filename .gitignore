@@ -112,3 +112,6 @@ GUI_App/examples/*
 .DS_Store
 Thumbs.db
 *.swp
+
+# Presentations / course templates
+*.pptx
