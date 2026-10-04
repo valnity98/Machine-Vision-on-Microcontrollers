@@ -17,7 +17,7 @@ Test: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environmen
 | **Accuracy (n = 90)** | 14.4 % | **73.3 %** |
 | Mean absolute error (objects) | 1.99 | **0.29** |
 | Mean run time on the STM32 (480 MHz) | 66.6 ms | **59.8 ms** |
-| Flash / RAM (incl. runtime) | — | 279 KB / 57 KB |
+| Flash / RAM (incl. runtime) | — | ≈ 279 KiB / ≈ 57 KiB |
 
 TinyML counts 0, 1 and 2 objects almost perfectly (100 %, 100 %, 95 %) but confuses 3 and 4 objects (25 % and 60 %). A likely cause is a **domain shift**: the training images for these classes were taken under different light and camera positions than the test frames. The classical pipeline struggles with shadows and a brightness gradient under a global threshold (example below). The [known limitations](#known-limitations) list a further point (an overflow in the firmware's Otsu threshold) that may have influenced the classical result.
 
@@ -142,7 +142,7 @@ Machine-Vision-on-Microcontrollers/
 │     └─ 2026_05_03_09_11_10/            # Training run artefacts
 │        ├─ Training_curves.png          # Loss / accuracy curves
 │        ├─ logs/metrics/train_metrics.csv
-│        └─ quantized_models/quantized_model.tflite   # ← deployable model (214 KiB)
+│        └─ quantized_models/quantized_model.tflite   # ← deployable model (304,216 B ≈ 297 KiB; the weights alone are 214.7 KiB)
 │
 ├─ requirements.txt                      # Unified Python dependencies
 └─ README.md
@@ -167,7 +167,7 @@ Machine-Vision-on-Microcontrollers/
 | RAM_D1 | 512 KB | Frame buffer (255 KB) + CV binary buffer (128 KB) |
 | RAM_D2 | 288 KB | CV temp buffer (128 KB) + CV background buffer (128 KB) |
 | RAM_D3 | 64 KB | TinyML activation buffer (40 KB) |
-| Flash | ~285 KB | X-CUBE-AI runtime + network weights (214 KB) |
+| Flash | 2 MB | X-CUBE-AI runtime + network: 285,355 B (≈ 279 KiB), thereof weights 219,844 B (214.7 KiB) |
 
 ---
 
@@ -256,8 +256,8 @@ python "ML training/src/predict_count_tflite.py" \
 | MACC (ops) | **7,550,858** |
 | Weights — Flash | **219,844 B (214.7 KiB)** |
 | Activations — RAM | **41,152 B (40.2 KiB)** |
-| Total Flash (incl. runtime) | **285,351 B (~279 KB)** |
-| Total RAM (incl. runtime) | **57,876 B (~57 KB)** |
+| Total Flash (incl. runtime) | **285,355 B (≈ 279 KiB)** |
+| Total RAM (incl. runtime) | **57,876 B (≈ 57 KiB)** |
 | Resize method | **Nearest-neighbour, full-frame stretch** (no padding, no letterbox) — firmware: `tinyml_preprocess.c`; training: `aspect_ratio: fit` + `interpolation: nearest` |
 
 ### Preprocessing — firmware and training
@@ -290,12 +290,14 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 |--------|-------|
 | Best validation accuracy | **97.14 %** (epochs 35, 36, 43, 44) |
 | Best training accuracy | **99.97 %** (epoch 55) |
-| Final validation accuracy | **94.29 %** (epoch 55) |
-| Training epochs | 56 logged (epochs 0–55, up to 100 configured) |
+| Validation accuracy in the last logged epoch | **94.29 %** (epoch 55) |
+| Training epochs | 56 logged (epochs 0–55, up to 100 configured; early stopping, patience 20) |
 | LR schedule | 1e-3 → 5e-4 (ep 30) → 2.5e-4 (ep 44) → 1.25e-4 (ep 52) |
 | Framework | TensorFlow 2 / Keras, ST Model Zoo |
 
 ![Training curves](ML%20training/Model/2026_05_03_09_11_10/Training_curves.png)
+
+> Both validation values are correct and describe different epochs: 97.14 % is the best epoch, 94.29 % the last logged one. All validation accuracies in `train_metrics.csv` are multiples of 1/350, so 97.14 % corresponds to 340 of 350 and 94.29 % to 330 of 350 validation images (derived from the CSV; the dataset is not in the repo), i.e. a difference of 10 images. `user_config.yaml` sets `restore_best_weights: true`, so Keras restores the weights of the best epoch when early stopping ends the training; which saved checkpoint the Model Zoo passed on to the quantiser was not verified.
 
 > Training on real OV2640 frames captured with the Dataset Capture tool. The real-world test in [Results](#results) used new scenes under different lighting, which is why its accuracy is lower than the validation accuracy here.  
 > Training and firmware use the same preprocessing mode: full-frame stretch (`aspect_ratio: fit`), nearest-neighbour interpolation, RGB. The exact pixel mapping of TensorFlow's nearest resize and of the firmware's integer-floor mapping was not compared.
@@ -304,9 +306,10 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 
 | Layer type | Count | % of MACC |
 |------------|-------|-----------|
-| Conv2D (standard + depthwise) | 27 + 14 = 41 | 99.3 % |
+| Conv2D (14 standard incl. 1×1 pointwise + 13 depthwise) | 14 + 13 = 27 | 99.2 % |
 | GlobalAvgPool + Dense + Softmax | 3 | 0.05 % |
 | Input conversion (u8→s8) | 1 | 0.7 % |
+| Output conversion (dequantise to float32) | 1 | < 0.01 % |
 
 ---
 
@@ -384,7 +387,7 @@ CVCFG: EN=1 PRESET=0 THR=128 THRMODE=0 INV=0
        BORDFILT=1 BGSUB=0 BGCAP=0
        ROIEN=0 ROIX=0 ROIY=0 ROIW=0 ROIH=0
 
-CVSTAT: COUNT=N MEAN=X MAX=X MIN=X BRIGHT=X TIME=Xms
+CVSTAT: COUNT=N MEAN=X MAX=X MIN=X BRIGHT=X TIME=X
         REJSMALL=X REJLARGE=X REJBORDER=X REJSHAPE=X
         FGPIX=X RAWCOMP=X BOXES=N
 CVBOX:  ID=N AREA=X X=X Y=X W=X H=X PERI=X CIRC=X
@@ -396,11 +399,13 @@ CVDONE
 ```
 TMCFG:  EN=1 INPUT=96x96x3 CLASSES=5 MODEL=count_model
 TMINFO: STATUS=XCUBEAI_OK RAM=41KB FLASH=215KB
-TMRES:  CLASS=COUNT_N IDX=N CONF=XXX TIME=Xms UNCERTAIN=0
+TMRES:  CLASS=COUNT_N IDX=N CONF=XXX TIME=X UNCERTAIN=0
 TMPROB: IDX=N NAME=COUNT_N SCORE=XXX
 TMDONE
 ```
 
+> `TIME` (in `CVSTAT` and `TMRES`) is the run time in **milliseconds**, printed as a plain integer without a unit suffix (`HAL_GetTick()` difference, 1 ms resolution). Only the `STAT` line has a unit suffix (`LAT=Xms`).
+> In `TMINFO`, `RAM` is the activation buffer and `FLASH` the network weights, each rounded up to full KiB (41 KiB / 215 KiB for this model); they are not the totals including runtime.
 > `CONF` and `SCORE` are in **permille (0…1000)**. The GUI normalises to 0.0–1.0.  
 > When `UNCERTAIN=1`, `CLASS=UNCERTAIN` and `IDX=-1` — the GUI marks it as uncertain, not a real class.
 
