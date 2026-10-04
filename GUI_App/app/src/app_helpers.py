@@ -85,19 +85,31 @@ def timestamp() -> str:
 # Normalisation / uncertainty helpers
 # ---------------------------------------------------------------------------
 
-def norm01(value: float) -> float:
+def permille_to_01(value: float) -> float:
     """
-    Normalise a firmware confidence value to 0.0–1.0.
+    Convert a firmware permille value (0..1000) to 0.0–1.0.
 
-    The firmware sends confidence as permille (0..1000).
-    Values already in [0.0, 1.0] are returned unchanged.
+    Always divides by 1000, so a raw value of 1 means 0.1 % (0.001), not 100 %.
+    Use this for raw TMRES CONF / TMPROB SCORE values straight from the parser.
     """
     try:
         v = float(value)
     except Exception:
         return 0.0
-    if v > 1.0:
-        v /= 1000.0
+    return max(0.0, min(1.0, v / 1000.0))
+
+
+def norm01(value: float) -> float:
+    """
+    Clamp an already normalised confidence/score to 0.0–1.0.
+
+    Expects a fraction (0.0–1.0), i.e. what TmResult stores. It does not rescale:
+    raw firmware permille values must go through permille_to_01() first.
+    """
+    try:
+        v = float(value)
+    except Exception:
+        return 0.0
     return max(0.0, min(1.0, v))
 
 

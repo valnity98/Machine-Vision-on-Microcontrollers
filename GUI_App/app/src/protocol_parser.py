@@ -366,8 +366,8 @@ def parse_tmres(line: str) -> tuple[str, int, float, int, bool]:
 
     Returns (class_name, class_index, confidence_0_to_1, time_ms, is_uncertain).
 
-    The firmware sends CONF as a permille value (0..1000).  norm01() in
-    app_helpers.py normalises it to 0.0–1.0 when the caller stores the result.
+    The firmware sends CONF as a permille value (0..1000).  permille_to_01() in
+    app_helpers.py converts it to 0.0–1.0 when the caller stores the result.
     """
     kv           = _pairs(line)
     is_uncertain = _to_int(kv.get("UNCERTAIN"), 0) != 0
