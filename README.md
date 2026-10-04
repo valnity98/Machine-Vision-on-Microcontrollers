@@ -215,7 +215,8 @@ The "STM32 ready" indicator appears after `OV2640 ready` is received.
 python "ML training/src/check_dataset.py" --root "ML training/dataset"
 
 # 2. Edit ML training/Model/user_config.yaml
-#    Set training_path, validation_path, quantization_path to absolute paths
+#    Replace the <path-to-dataset> placeholders (training_path, validation_path,
+#    quantization_path) with the absolute path of your local dataset folder
 
 # 3. Clone ST Model Zoo (once) and install its own requirements
 #    (the Model Zoo has no setup.py/pyproject.toml, so "pip install -e" does not work;

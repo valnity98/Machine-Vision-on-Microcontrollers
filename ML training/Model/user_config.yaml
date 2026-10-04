@@ -18,16 +18,18 @@ model:
 dataset:
   dataset_name: custom_dataset
   class_names: [count_0, count_1, count_2, count_3, count_4]
-  # Set these to absolute paths pointing to your local dataset clone.
-  # Example (Windows):   "C:/Users/<you>/STM32_MERO2/ML training/dataset/train"
-  # Example (Linux/Mac): "/home/<you>/STM32_MERO2/ML training/dataset/train"
-  training_path:   "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/train"        # REQUIRED — set before running training
-  validation_path: "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/val"        # REQUIRED — set before running training
+  # PLACEHOLDERS: replace <path-to-dataset> with the absolute path of your local dataset
+  # folder ("ML training/dataset" of this repo, git-ignored). It must contain
+  # train/count_0 ... count_4 and val/count_0 ... count_4.
+  # Example (Windows):   "C:/Users/<you>/Machine-Vision-on-Microcontrollers/ML training/dataset/train"
+  # Example (Linux/Mac): "/home/<you>/Machine-Vision-on-Microcontrollers/ML training/dataset/train"
+  training_path:   "<path-to-dataset>/train"        # REQUIRED — set before running training
+  validation_path: "<path-to-dataset>/val"        # REQUIRED — set before running training
   validation_split:
   test_path:
   # Point to a representative subset of REAL OV2640 frames for PTQ calibration.
   # Using training data as fallback is acceptable but may produce suboptimal scales.
-  quantization_path: "C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/dataset/train"       # REQUIRED — set to training_path or a calibration subset
+  quantization_path: "<path-to-dataset>/train"       # REQUIRED — set to training_path or a calibration subset
   quantization_split: 0.2      # 20% of training set used for calibration
   check_image_files: False
   seed: 42
