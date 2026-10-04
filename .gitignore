@@ -3,15 +3,14 @@
 # ============================================================
 
 # ── Excluded by user request ─────────────────────────────────
-Ablauf/
-Bericht/
-Revised_Expose_STM32_Edge_Vision_counting.docx
 GUI_App/app/src/outputs
 
 # ── STM32CubeIDE workspace metadata ──────────────────────────
 CubeIDE_Workspace/.metadata/
 CubeIDE_Workspace/workspace/
 CubeIDE_Workspace/**/.settings/
+# X-CUBE-AI analysis caches (generated, contain local paths)
+CubeIDE_Workspace/**/.ai/
 CubeIDE_Workspace/**/Debug/
 CubeIDE_Workspace/**/Release/
 CubeIDE_Workspace/**/*.launch
