@@ -120,8 +120,9 @@ class RxMixin:
         self._last_format    = fmt
         self._current_image_folder = None
         self._current_image_index += 1
-        # Clear stale CV result when a new frame arrives
+        # Clear stale CV and TinyML results when a new frame arrives
         self._cv_result = None
+        self._tm_result = None
         self._cv_pending_boxes.clear()
         self._update_cv_idle_display()
 
