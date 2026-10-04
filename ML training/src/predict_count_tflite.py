@@ -15,7 +15,7 @@ Usage
   python predict_count_tflite.py --model path/to/quantized_model.tflite \
                                   --image path/to/frame.png
 
-  # Folder of images (prints per-image results + accuracy if --labels given)
+  # Folder of images (prints per-image results + accuracy if --true-class given)
   python predict_count_tflite.py --model path/to/quantized_model.tflite \
                                   --folder path/to/test/count_2 \
                                   --true-class count_2
