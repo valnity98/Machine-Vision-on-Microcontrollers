@@ -212,18 +212,27 @@ python "ML training/src/check_dataset.py" --root "ML training/dataset"
 # 2. Edit ML training/Model/user_config.yaml
 #    Set training_path, validation_path, quantization_path to absolute paths
 
-# 3. Clone ST Model Zoo (once)
+# 3. Clone ST Model Zoo (once) and install its own requirements
+#    (the Model Zoo has no setup.py/pyproject.toml, so "pip install -e" does not work;
+#     use a separate virtual environment as described in the Model Zoo README -
+#     its pinned versions, e.g. tensorflow, differ from this repo's requirements.txt)
 cd "ML training/Model"
-git clone https://github.com/STMicroelectronics/stm32ai-modelzoo-services
-pip install -e stm32ai-modelzoo-services
+git clone https://github.com/STMicroelectronics/stm32ai-modelzoo-services --depth 1
+cd stm32ai-modelzoo-services
+pip install -r requirements.txt
 
-# 4. Train + quantise (chain_tqe)
-cd stm32ai-modelzoo-services/image_classification/tf
+# 4. Train + quantise (chain_tqe) - stm32ai_main.py is in image_classification/ (not in tf/)
+#    --config-path is resolved relative to the folder of stm32ai_main.py:
+#    ../.. = "ML training/Model" (where user_config.yaml lies). An absolute path also works.
+cd image_classification
 python stm32ai_main.py \
-    --config-path ../../.. \
+    --config-path ../.. \
     --config-name user_config.yaml
+#    Output: image_classification/tf/src/experiments_outputs/<timestamp>/
 
-# 5. Verify on PC
+# 5. Verify on PC (from the repository root; copy the run folder
+#    experiments_outputs/<timestamp> to "ML training/Model/<timestamp>" first,
+#    or point --model to the file in experiments_outputs)
 python "ML training/src/predict_count_tflite.py" \
     --model "ML training/Model/2026_05_03_09_11_10/quantized_models/quantized_model.tflite" \
     --image path/to/frame.png \
@@ -458,13 +467,15 @@ training:
 ### 3. Train (ST Model Zoo)
 
 ```bash
-cd "ML training/Model/stm32ai-modelzoo-services/image_classification/tf"
+cd "ML training/Model/stm32ai-modelzoo-services/image_classification"
 python stm32ai_main.py \
-    --config-path ../../.. \
+    --config-path ../.. \
     --config-name user_config.yaml
 ```
 
-Output: `experiments_outputs/<timestamp>/quantized_models/quantized_model.tflite`
+`stm32ai_main.py` is located in `image_classification/` (not in `tf/`). Hydra resolves `--config-path` relative to the folder of `stm32ai_main.py`, so `../..` points to `ML training/Model` (where `user_config.yaml` lies); an absolute path works as well. The output folder comes from `hydra: run: dir:` in `user_config.yaml`, a path relative to the working directory. Started from `image_classification/`, the result is:
+
+`image_classification/tf/src/experiments_outputs/<timestamp>/quantized_models/quantized_model.tflite`
 
 ### 4. Verify preprocessing parity on PC
 
