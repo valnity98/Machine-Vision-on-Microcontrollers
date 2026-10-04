@@ -81,6 +81,11 @@ def timestamp() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+def timestamp_ms() -> str:
+    """Return a filesystem-safe timestamp with milliseconds (YYYYMMDD_HHmmss_mmm)."""
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+
 # ---------------------------------------------------------------------------
 # Normalisation / uncertainty helpers
 # ---------------------------------------------------------------------------

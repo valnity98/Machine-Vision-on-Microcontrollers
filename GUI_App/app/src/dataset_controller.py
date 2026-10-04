@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 )
 
 from app_constants import DEFAULT_BAUDRATE_INT
-from app_helpers import timestamp
+from app_helpers import timestamp_ms
 
 
 class DatasetMixin:
@@ -101,7 +101,7 @@ class DatasetMixin:
             self._log("ERR", f"Dataset: cannot create folder {target}: {exc}")
             return False
 
-        ts = timestamp()
+        ts = timestamp_ms()
         if self._last_format == "JPEG" and self._last_raw_bytes:
             file_path = target / f"img_{ts}.jpg"
             try:
