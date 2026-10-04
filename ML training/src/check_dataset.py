@@ -36,27 +36,27 @@ OPTIONAL_SPLITS  = ["test"]
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp"}
 
 
-def check_split(root: Path, split: str, required: bool) -> dict[str, int]:
+def check_split(root: Path, split: str, required: bool) -> tuple[dict[str, int], list[str]]:
+    """Check one split folder. Returns (images per class, list of problems found)."""
     split_dir = root / split
     counts: dict[str, int] = {}
     errors: list[str]      = []
 
     if not split_dir.exists():
         if required:
-            errors.append(f"  MISSING required split folder: {split_dir}")
-            for e in errors:
-                print(e)
+            errors.append(f"{split}: missing required split folder")
+            print(f"  MISSING required split folder: {split_dir}")
         else:
             print(f"  SKIP optional split '{split}' (not found)")
-        return counts
+        return counts, errors
 
     print(f"\n  [{split}]  {split_dir}")
 
     for cls in EXPECTED_CLASSES:
         cls_dir = split_dir / cls
         if not cls_dir.exists():
-            print(f"    ✗ MISSING class folder: {cls_dir}")
-            errors.append(cls)
+            print(f"    ERROR   MISSING class folder: {cls_dir}")
+            errors.append(f"{split}/{cls}: missing class folder")
             counts[cls] = 0
             continue
 
@@ -65,19 +65,21 @@ def check_split(root: Path, split: str, required: bool) -> dict[str, int]:
         counts[cls] = len(imgs)
 
         if len(imgs) == 0:
-            print(f"    ✗ EMPTY   {cls:12s}  (0 images)")
+            print(f"    ERROR   EMPTY   {cls:12s}  (0 images)")
+            errors.append(f"{split}/{cls}: no images")
         elif len(imgs) < 10:
-            print(f"    ⚠ FEW     {cls:12s}  ({len(imgs)} images — recommend ≥ 50)")
+            print(f"    WARNING FEW     {cls:12s}  ({len(imgs)} images - recommend >= 50)")
         else:
-            print(f"    ✓ OK      {cls:12s}  ({len(imgs)} images)")
+            print(f"    OK      OK      {cls:12s}  ({len(imgs)} images)")
 
     # Check for unexpected class folders
     actual_classes = {d.name for d in split_dir.iterdir() if d.is_dir()}
     extra = actual_classes - set(EXPECTED_CLASSES)
-    for e in extra:
-        print(f"    ⚠ UNEXPECTED class folder: {e}")
+    for e in sorted(extra):
+        print(f"    ERROR   UNEXPECTED class folder: {e}")
+        errors.append(f"{split}/{e}: unexpected class folder")
 
-    return counts
+    return counts, errors
 
 
 def main() -> None:
@@ -93,11 +95,14 @@ def main() -> None:
         sys.exit(1)
 
     all_counts: dict[str, dict[str, int]] = {}
+    problems: list[str] = []
 
     for split in EXPECTED_SPLITS:
-        all_counts[split] = check_split(root, split, required=True)
+        all_counts[split], errs = check_split(root, split, required=True)
+        problems.extend(errs)
     for split in OPTIONAL_SPLITS:
-        all_counts[split] = check_split(root, split, required=False)
+        all_counts[split], errs = check_split(root, split, required=False)
+        problems.extend(errs)
 
     # Summary
     print("\n  Summary")
@@ -122,16 +127,23 @@ def main() -> None:
         if max(counts, default=0) > 0:
             ratio = max(counts) / max(min(counts), 1)
             if ratio > 3:
-                print(f"\n  ⚠ [{split}] Class imbalance: max/min ratio = {ratio:.1f}x — consider balancing.")
+                print(f"\n  WARNING [{split}] Class imbalance: max/min ratio = {ratio:.1f}x - consider balancing.")
 
     # Total
     total_train = sum(all_counts.get("train", {}).values())
     total_val   = sum(all_counts.get("val",   {}).values())
     print(f"\n  Total train: {total_train}  |  Total val: {total_val}")
     if total_train < 100:
-        print("  ⚠ Very few training images — model may overfit. Recommend ≥ 50 per class.")
+        print("  WARNING Very few training images - model may overfit. Recommend >= 50 per class.")
     if total_val < 25:
-        print("  ⚠ Very few validation images. Recommend ≥ 10 per class.")
+        print("  WARNING Very few validation images. Recommend >= 10 per class.")
+
+    if problems:
+        print(f"\nFAILED: {len(problems)} problem(s) found:")
+        for p in problems:
+            print(f"  - {p}")
+        print()
+        sys.exit(1)
 
     print("\nDone.\n")
 
