@@ -612,7 +612,7 @@ pip install -r requirements.txt
 |------|------|
 | Mutasem Bader | STM32 firmware (FreeRTOS, DCMI/DMA, CV engine, TinyML integration, UART protocol), ML training pipeline, measurements, system integration |
 
-The PySide6 dashboard (`GUI_App/`) was created with AI assistance.
+AI assistance was used in this project: for the PySide6 dashboard (`GUI_App/`), the ML training scripts (`ML training/src/`), the comments and file headers in the firmware sources and parts of the documentation.
 
 ---
 
