@@ -1,18 +1,18 @@
 ST Edge AI Core v2.2.0-20266 2adc00962
 Created date          : 2026-06-27 20:35:42
-Parameters            : generate --target stm32h7 --name network -m C:/Users/MBade/Documents/GitHub/Machine-Vision-on-Microcontrollers/ML training/Model/stm32ai-modelzoo-services/image_classification/tf/src/experiments_outputs/2026_06_27_20_08_38/quantized_models/quantized_model.tflite --compression none --verbosity 1 --workspace C:/Users/MBade/AppData/Local/Temp/mxAI_workspace2060055784150018102518893671704640 --output C:/Users/MBade/.stm32cubemx/network_output
+Parameters            : generate --target stm32h7 --name network -m <repo-root>/ML training/Model/stm32ai-modelzoo-services/image_classification/tf/src/experiments_outputs/2026_06_27_20_08_38/quantized_models/quantized_model.tflite --compression none --verbosity 1 --workspace C:/Users/<user>/AppData/Local/Temp/mxAI_workspace2060055784150018102518893671704640 --output C:/Users/<user>/.stm32cubemx/network_output
 
 Exec/report summary (generate)
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-model file         :   C:\Users\MBade\Documents\GitHub\Machine-Vision-on-Microcontrollers\ML training\Model\stm32ai-modelzoo-services\image_classification\tf\src\experiments_outputs\2026_06_27_20_08_38\quantized_models\quantized_model.tflite   
+model file         :   <repo-root>\ML training\Model\stm32ai-modelzoo-services\image_classification\tf\src\experiments_outputs\2026_06_27_20_08_38\quantized_models\quantized_model.tflite                                                          
 type               :   tflite                                                                                                                                                                                                                       
 c_name             :   network                                                                                                                                                                                                                      
 compression        :   none                                                                                                                                                                                                                         
 options            :   allocate-inputs, allocate-outputs                                                                                                                                                                                            
 optimization       :   balanced                                                                                                                                                                                                                     
 target/series      :   stm32h7                                                                                                                                                                                                                      
-workspace dir      :   C:\Users\MBade\AppData\Local\Temp\mxAI_workspace2060055784150018102518893671704640                                                                                                                                           
-output dir         :   C:\Users\MBade\.stm32cubemx\network_output                                                                                                                                                                                   
+workspace dir      :   C:\Users\<user>\AppData\Local\Temp\mxAI_workspace2060055784150018102518893671704640                                                                                                                                          
+output dir         :   C:\Users\<user>\.stm32cubemx\network_output                                                                                                                                                                                  
 model_fmt          :   sa/ua per tensor                                                                                                                                                                                                             
 model_name         :   quantized_model                                                                                                                                                                                                              
 model_hash         :   0x31242ccf5b4a7e963d591155d9efe179                                                                                                                                                                                           
@@ -641,10 +641,10 @@ macc=7,550,858 weights=219,844 act=41,152 ram_io=0
 
 Generated files (7)
 ------------------------------------------------------------------ 
-C:\Users\MBade\.stm32cubemx\network_output\network_data_params.h   
-C:\Users\MBade\.stm32cubemx\network_output\network_data_params.c   
-C:\Users\MBade\.stm32cubemx\network_output\network_data.h          
-C:\Users\MBade\.stm32cubemx\network_output\network_data.c          
-C:\Users\MBade\.stm32cubemx\network_output\network_config.h        
-C:\Users\MBade\.stm32cubemx\network_output\network.h               
-C:\Users\MBade\.stm32cubemx\network_output\network.c               
+C:\Users\<user>\.stm32cubemx\network_output\network_data_params.h  
+C:\Users\<user>\.stm32cubemx\network_output\network_data_params.c  
+C:\Users\<user>\.stm32cubemx\network_output\network_data.h         
+C:\Users\<user>\.stm32cubemx\network_output\network_data.c         
+C:\Users\<user>\.stm32cubemx\network_output\network_config.h       
+C:\Users\<user>\.stm32cubemx\network_output\network.h              
+C:\Users\<user>\.stm32cubemx\network_output\network.c              
