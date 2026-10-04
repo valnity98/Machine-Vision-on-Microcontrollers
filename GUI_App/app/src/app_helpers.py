@@ -54,10 +54,11 @@ def ui_path() -> Path:
       2. <script_dir>/../ui/reference_window.ui   (app/src/ → app/ui/ via parent)
       3. <script_dir>/reference_window.ui         (flat layout fallback)
 
-    In a PyInstaller frozen build, looks in the _MEIPASS temp directory.
+    In a PyInstaller frozen build, the file is bundled into the "ui" folder of the
+    _MEIPASS temp directory (<_MEIPASS>/ui/reference_window.ui).
     """
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return Path(sys._MEIPASS) / "reference_window.ui"
+        return Path(sys._MEIPASS) / "ui" / "reference_window.ui"
 
     script_dir = Path(__file__).resolve().parent
 
