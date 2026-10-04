@@ -11,7 +11,7 @@ import re
 from PySide6.QtCore import QTimer
 
 from image_utils import jpeg_bytes_to_qimage, rgb565_bytes_to_qimage, gray8_bytes_to_qimage
-from app_helpers import FrameTransfer, norm01
+from app_helpers import FrameTransfer, permille_to_01
 from protocol_parser import (
     TINYML_INPUT_DESC, TmResult,
     parse_cvcfg, parse_cvbox, parse_cvstat,
@@ -273,7 +273,7 @@ class RxMixin:
             self._tm_pending = TmResult(
                 predicted_name    = name,
                 predicted_index   = idx,
-                confidence        = norm01(conf),
+                confidence        = permille_to_01(conf),
                 is_uncertain      = is_unc,
                 inference_time_ms = t_ms,
             )
@@ -282,7 +282,7 @@ class RxMixin:
         if line.startswith("TMPROB:"):
             if self._tm_pending is not None:
                 pidx, pname, pscore = parse_tmprob(line)
-                self._tm_pending.scores[pname] = norm01(pscore)
+                self._tm_pending.scores[pname] = permille_to_01(pscore)
             return
 
         if line.startswith("TMDONE"):
