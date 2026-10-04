@@ -66,18 +66,19 @@ Create folders only:
 
     python train_count_model.py --init-dirs
 
-Train and export:
+Train and export (paths relative to the repository root; if omitted, --dataset
+and --artifacts default to "ML training/dataset" and "ML training/artifacts"):
 
     python train_count_model.py \
-        --dataset "E:/Studium_Projekte/STM32_MERO2/ML training/dataset" \
-        --artifacts "E:/Studium_Projekte/STM32_MERO2/ML training/artifacts" \
+        --dataset "ML training/dataset" \
+        --artifacts "ML training/artifacts" \
         --epochs 100 --batch-size 16
 
 Then verify one image:
 
     python predict_count_tflite.py \
-        --image "E:/Studium_Projekte/STM32_MERO2/ML training/dataset/val/count_3/example.png" \
-        --model "E:/Studium_Projekte/STM32_MERO2/ML training/artifacts/count_model_uint8.tflite"
+        --image "ML training/dataset/val/count_3/example.png" \
+        --model "ML training/artifacts/count_model_uint8.tflite"
 
 Generated artifacts
 -------------------
@@ -126,7 +127,8 @@ INPUT_SHAPE = (INPUT_H, INPUT_W, INPUT_C)
 DEFAULT_BATCH_SIZE = 16
 DEFAULT_EPOCHS = 100
 DEFAULT_SEED = 42
-DEFAULT_ML_ROOT = Path(r"E:\Studium_Projekte\STM32_MERO2\ML training")
+# "ML training" folder of the repository (this file lives in "ML training/src/").
+DEFAULT_ML_ROOT = Path(__file__).resolve().parent.parent
 
 
 @dataclass(frozen=True)
@@ -206,8 +208,8 @@ class ImageSequence(keras.utils.Sequence):
 
 
 def default_ml_root() -> Path:
-    """Return the preferred project root or the current directory."""
-    return DEFAULT_ML_ROOT if DEFAULT_ML_ROOT.exists() else Path.cwd()
+    """Return the "ML training" folder of the repository (parent of src/)."""
+    return DEFAULT_ML_ROOT
 
 
 def parse_args() -> argparse.Namespace:

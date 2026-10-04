@@ -21,7 +21,7 @@ Expected layout:
       ...
 
 Usage:
-  python check_dataset.py --root "E:/Studium_Projekte/STM32_MERO2/ML training/dataset"
+  python check_dataset.py --root "ML training/dataset"
 """
 
 from __future__ import annotations
