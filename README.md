@@ -19,13 +19,14 @@ Test: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environmen
 
 ![CV debug images of a 4-object scene](docs/images/cv_debug_count4.png)
 
-*(a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard (artefacts at the border), (d) STM32 result overlay: the classical pipeline on the chip returned `count=0`, TinyML classified the same frame correctly as 4 objects.*
+*(a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard (PC-side floating-point computation, threshold step only; all four objects are separated, the dark areas at the border are artefacts), (d) STM32 result overlay: the classical pipeline on the chip returned `count=0`, TinyML classified the same frame correctly as 4 objects. The cause for this individual frame was not analysed; the Otsu overflow in the measured firmware version is a possible reason.*
 
 ## Known limitations
 
 Found in a later code review, after the measurements above:
 
-1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. A corrected version (floating-point score) is prepared but has **not been re-measured yet**.
+1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The `cv_engine.c` checked in here still contains the overflowing code; a corrected version (floating-point score) is prepared but has **not been re-measured yet**.
+
 This is the first thing to fix before a re-measurement.
 
 ---
