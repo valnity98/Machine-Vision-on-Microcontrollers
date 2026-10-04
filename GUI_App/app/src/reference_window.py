@@ -168,7 +168,13 @@ class ReferenceWindowController(
 
         # ── Dataset capture state ─────────────────────────────────────────
         # Default dataset root: ML training/dataset at the repo root (3 levels above src/).
-        self._dataset_default_root = self._project_root.parents[2] / "ML training" / "dataset"
+        # In a frozen build the project root can be too shallow for that; fall back
+        # to a "dataset" folder next to the executable instead of raising IndexError.
+        _root_parents = self._project_root.parents
+        if len(_root_parents) > 2:
+            self._dataset_default_root = _root_parents[2] / "ML training" / "dataset"
+        else:
+            self._dataset_default_root = self._project_root / "dataset"
         self._dataset_timer         = QTimer(self.window)
         self._dataset_timer.setSingleShot(True)
         self._dataset_timer.timeout.connect(self._dataset_next_capture)
