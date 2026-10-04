@@ -14,16 +14,20 @@ Test: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environmen
 
 | | Classical CV (Otsu) | TinyML (MobileNetV1-0.25) |
 |---|---|---|
-| **Accuracy (n = 90)** | 14.4 % | **73.3 %** |
+| **Accuracy (n = 90)** | 14.4 % ¹ | **73.3 %** |
 | Mean absolute error (objects) | 1.99 | **0.29** |
 | Mean run time on the STM32 (480 MHz) | 66.6 ms | **59.8 ms** |
 | Flash / RAM (incl. runtime) | — | ≈ 279 KiB / ≈ 57 KiB |
 
-TinyML counts 0, 1 and 2 objects almost perfectly (100 %, 100 %, 95 %) but confuses 3 and 4 objects (25 % and 60 %). A likely cause is a **domain shift**: the training images for these classes were taken under different light and camera positions than the test frames. The classical pipeline struggles with shadows and a brightness gradient under a global threshold (example below). The [known limitations](#known-limitations) list a further point (an overflow in the firmware's Otsu threshold) that may have influenced the classical result.
+¹ Measured with a firmware version that contains a known overflow in the Otsu threshold (see [known limitations](#known-limitations)). The value is **not** a performance limit of the classical method; a corrected version is prepared but has not been re-measured.
+
+TinyML counts 0, 1 and 2 objects almost perfectly (100 %, 100 %, 95 %) but confuses 3 and 4 objects (25 % and 60 %). A likely cause is a **domain shift**: the training images for these classes were taken under different light and camera positions than the test frames.
+
+**Reading the classical result:** the 14.4 % comes from the firmware version with the Otsu overflow described in the [known limitations](#known-limitations), so it says little about what the classical pipeline can achieve once that is fixed. Shadows and brightness gradients can affect a global threshold in general, but this measurement does not separate that effect from the overflow. The example below shows a frame where the pipeline on the chip found no object although the Otsu threshold image computed on the PC separates all four.
 
 ![CV debug images of a 4-object scene](docs/images/cv_debug_count4.png)
 
-*(a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard (artefacts at the border), (d) STM32 result overlay: the classical pipeline on the chip returned `count=0`, TinyML classified the same frame correctly as 4 objects.*
+*(a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard (PC-side floating-point computation, threshold step only; all four objects are separated, the dark areas at the border are artefacts), (d) STM32 result overlay: the classical pipeline on the chip returned `count=0`, TinyML classified the same frame correctly as 4 objects. The cause for this individual frame was not analysed; the Otsu overflow in the measured firmware version is a possible reason.*
 
 > The 97 % in the [training results](#training-results) is the validation accuracy on images from the training domain, not the result on the real-world test above.
 
@@ -31,7 +35,8 @@ TinyML counts 0, 1 and 2 objects almost perfectly (100 %, 100 %, 95 %) but confu
 
 Found in a later code review, after the measurements above:
 
-1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The classical pipeline was measured with this version, so its 14.4 % is probably too pessimistic. A corrected version (floating-point score) is prepared but has **not been re-measured yet**.
+1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The classical pipeline was measured with this version, so its 14.4 % should not be read as the performance limit of the classical method. The `cv_engine.c` checked in here still contains the overflowing code; a corrected version (floating-point score) is prepared but has **not been re-measured yet**.
+
 This is the first thing to fix before a re-measurement.
 
 ---
