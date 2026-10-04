@@ -525,11 +525,6 @@ For a **reproducible CV vs TinyML comparison**:
 
 Both run times are nearly constant and independent of the scene.
 
------------|----------------|
-| SNAP (QVGA RGB565) | ~150–250 ms |
-| CV RUN (ROBUST preset, QVGA) | ~15–40 ms |
-| TM RUN (QVGA → 96×96 preprocess + inference) | ~120–200 ms |
-
 ---
 
 ## Troubleshooting
@@ -576,9 +571,6 @@ pip install -r requirements.txt
 | Name | Role |
 |------|------|
 | Mutasem Bader | STM32 firmware (FreeRTOS, DCMI/DMA, CV engine, TinyML integration, UART protocol), ML training pipeline, measurements, system integration |
-
-------|------|
-| Mutasem Bader | STM32 firmware (FreeRTOS, DCMI/DMA, CV engine, TinyML, UART protocol), Python GUI dashboard, ML training pipeline, system integration |
 
 ---
 
