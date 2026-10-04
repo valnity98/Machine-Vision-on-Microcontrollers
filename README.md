@@ -26,7 +26,7 @@ Test: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environmen
 Found in a later code review, after the measurements above:
 
 1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. A corrected version (floating-point score) is prepared but has **not been re-measured yet**.
-Both points are the first things to fix before a re-measurement.
+This is the first thing to fix before a re-measurement.
 
 ---
 
@@ -243,9 +243,9 @@ python "ML training/src/predict_count_tflite.py" \
 | Activations — RAM | **41,152 B (40.2 KiB)** |
 | Total Flash (incl. runtime) | **285,351 B (~279 KB)** |
 | Total RAM (incl. runtime) | **57,876 B (~57 KB)** |
-| Resize method (firmware) | **Nearest-neighbour, full-frame stretch** (no padding, no letterbox) |
+| Resize method | **Nearest-neighbour, full-frame stretch** (no padding, no letterbox) — firmware: `tinyml_preprocess.c`; training: `aspect_ratio: fit` + `interpolation: nearest` |
 
-### ⚠ Preprocessing — firmware and training should match
+### Preprocessing — firmware and training
 
 The STM32 firmware (`tinyml_preprocess.c`) maps each pixel with integer-floor nearest-neighbour and stretches the full frame:
 
@@ -254,7 +254,7 @@ sx = ox * src_width  / 96;   // integer floor — no rounding
 sy = oy * src_height / 96;
 ```
 
-The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest`, `color_mode: rgb` and **`aspect_ratio: fit`** (letterboxing). `fit` differs from the firmware's stretch, a known limitation (see [Known limitations](#known-limitations)). For a matching pipeline set `aspect_ratio: stretch` and retrain.
+The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest`, `color_mode: rgb` and **`aspect_ratio: fit`**. In the ST Model Zoo, `fit` resizes the image to the target size and distorts it if the aspect ratio differs; it does **not** letterbox. The other valid values are `crop` (cropping) and `padding` (black borders); `stretch` is not a valid value. So `aspect_ratio: fit` in training corresponds to the full-frame stretch the firmware performs.
 
 ### Common misconfigurations
 
@@ -262,6 +262,7 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 |-------------|--------------|--------|
 | `input_shape: (48, 48, 1)` | `(96, 96, 3)` | Wrong model size |
 | `color_mode: grayscale` | `rgb` | 1-channel vs 3-channel mismatch |
+| `aspect_ratio: crop` or `padding` | `fit` | Training sees cropped or bordered images, the chip stretches the full frame |
 | `board: STM32H747I-DISCO` | `NUCLEO-H743ZI2` | Wrong benchmarking target |
 
 ---
@@ -282,7 +283,7 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 ![Training curves](ML%20training/Model/2026_05_03_09_11_10/Training_curves.png)
 
 > Training on real OV2640 frames captured with the Dataset Capture tool.  
-> The preprocessing pipeline (nearest-floor resize, full-frame stretch, RGB) exactly mirrors the STM32 firmware.
+> Training and firmware use the same preprocessing mode: full-frame stretch (`aspect_ratio: fit`), nearest-neighbour interpolation, RGB. The exact pixel mapping of TensorFlow's nearest resize and of the firmware's integer-floor mapping was not compared.
 
 **X-CUBE-AI analysis summary** (`network_generate_report.txt`)
 
@@ -437,7 +438,7 @@ dataset:
 preprocessing:
   resizing:
     interpolation: nearest
-    aspect_ratio: stretch    # ← must match the firmware (the checked-in config still has "fit")
+    aspect_ratio: fit        # full-frame stretch = same as the firmware ("stretch" is not a valid value)
   color_mode: rgb            # ← critical
 
 model:

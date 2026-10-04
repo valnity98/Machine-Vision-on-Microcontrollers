@@ -10,9 +10,9 @@
  * This matches predict_count_tflite.py on the PC side; the FNV-1a hash
  * comparison verifies both use identical preprocessing.
  *
- * Note: the training config uses aspect_ratio: fit (letterboxing on 480x272
- * training images). This creates a known preprocessing difference between
- * training and inference, documented as a limitation in the thesis.
+ * Note: the training config uses aspect_ratio: fit. In the ST Model Zoo, "fit"
+ * resizes the image to the target size without preserving the aspect ratio
+ * (no letterboxing), i.e. the same full-frame stretch as done here.
  *
  * Byte-swap note:
  *   OV2640 outputs RGB565 big-endian over DCMI. The STM32 DMA stores pixels
