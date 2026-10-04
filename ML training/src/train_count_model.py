@@ -77,8 +77,7 @@ Then verify one image:
 
     python predict_count_tflite.py \
         --image "E:/Studium_Projekte/STM32_MERO2/ML training/dataset/val/count_3/example.png" \
-        --model "E:/Studium_Projekte/STM32_MERO2/ML training/artifacts/count_model_uint8.tflite" \
-        --save-preview --save-json
+        --model "E:/Studium_Projekte/STM32_MERO2/ML training/artifacts/count_model_uint8.tflite"
 
 Generated artifacts
 -------------------
@@ -509,15 +508,33 @@ def save_history(history: keras.callbacks.History, artifacts_root: Path) -> Path
 # ---------------------------------------------------------------------------
 
 
-def representative_dataset(image_paths: list[Path], *, apply_rgb565: bool, max_samples: int = 200):
-    """Yield representative samples for full-integer post-training quantization."""
-    sample_paths = image_paths[:max_samples]
+def representative_dataset(
+    image_paths: list[Path],
+    *,
+    apply_rgb565: bool,
+    max_samples: int = 200,
+    seed: int = DEFAULT_SEED,
+):
+    """Yield representative samples for full-integer post-training quantization.
+
+    image_paths is sorted by class, so a plain slice would only cover the first
+    classes. A random sample with a fixed seed covers all classes and is
+    reproducible.
+    """
+    sample_paths = random.Random(seed).sample(image_paths, min(max_samples, len(image_paths)))
     for path in sample_paths:
         arr = preprocess_image_to_uint8(path, apply_rgb565=apply_rgb565).astype(np.float32)
         yield [arr.reshape(1, INPUT_H, INPUT_W, INPUT_C)]
 
 
-def export_tflite_models(model: keras.Model, artifacts_root: Path, train_paths: list[Path], *, apply_rgb565: bool) -> tuple[Path, Path]:
+def export_tflite_models(
+    model: keras.Model,
+    artifacts_root: Path,
+    train_paths: list[Path],
+    *,
+    apply_rgb565: bool,
+    seed: int = DEFAULT_SEED,
+) -> tuple[Path, Path]:
     """Export float and uint8 TFLite models."""
     float_converter = tf.lite.TFLiteConverter.from_keras_model(model)
     float_tflite = float_converter.convert()
@@ -530,6 +547,7 @@ def export_tflite_models(model: keras.Model, artifacts_root: Path, train_paths: 
         train_paths,
         apply_rgb565=apply_rgb565,
         max_samples=min(200, len(train_paths)),
+        seed=seed,
     )
     uint8_converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
     uint8_converter.inference_input_type = tf.uint8
@@ -644,6 +662,7 @@ def main() -> int:
         args.artifacts,
         train_paths,
         apply_rgb565=apply_rgb565,
+        seed=args.seed,
     )
     sanity_check_tflite(uint8_path)
 
