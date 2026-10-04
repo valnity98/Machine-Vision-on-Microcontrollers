@@ -60,7 +60,7 @@ static ai_handle g_network    = AI_HANDLE_NULL;
 static uart_tx_t *g_diag_uart = NULL;
 
 /* Activation buffer in RAM_D3 (.tinyml_buf, NOLOAD).
- * Placed in RAM_D3 (64 KB Backup SRAM) so neither RAM_D1 (DMA buffers)
+ * Placed in RAM_D3 (64 KB SRAM4) so neither RAM_D1 (DMA buffers)
  * nor RAM_D2 (CV scratch) are affected.
  * X-CUBE-AI only requires CPU access; no DMA needed for activations.
  * Must be zeroed by tinyml_init() before every ai_network_create_and_init()

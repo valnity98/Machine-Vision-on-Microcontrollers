@@ -34,11 +34,15 @@
  *
  * ── RAM_D3 budget ───────────────────────────────────────────────────────────
  *
- *  g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE  (~57 KB typical)  .tinyml_buf
+ *  g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE  (41 152 B, X-CUBE-AI report)  .tinyml_buf
  *  ─────────────────────────────────────────────────────────────────────────
- *  Total                   ~58 368 B  (~57 KB)  of 64 KB   ✅ (~7 KB free)
+ *  Total                   41 152 B  (~40.2 KB)  of 64 KB   ✅ (~23.8 KB free)
  *
- *  X-CUBE-AI only requires CPU access; RAM_D3 (Backup SRAM) is suitable.
+ *  The 57 876 B in the X-CUBE-AI report are the total RAM of the network
+ *  including its runtime (activations 41 152 B + runtime 16 724 B); only the
+ *  activations are placed in RAM_D3.
+ *
+ *  X-CUBE-AI only requires CPU access; RAM_D3 (SRAM4, D3 domain) is suitable.
  *  IMPORTANT: MPU_Config() in main.c MUST cover RAM_D3 (0x38000000, 64 KB)
  *  as Non-Cacheable (Region 3, TEX=1 C=0 B=0).  Without this the Cortex-M7
  *  D-Cache may serve stale reads from the activation buffer.
@@ -257,7 +261,7 @@ SECTIONS
     __cvbg_buf_end__ = .;
   } >RAM_D2
 
-  /* ── RAM_D3 (Backup SRAM, 0x38000000, 64 KB) — TinyML activation buffer ────
+  /* ── RAM_D3 (SRAM4, 0x38000000, 64 KB) — TinyML activation buffer ──────────
    *
    * NOLOAD: not zeroed by startup.
    * IMPORTANT: MPU Region 3 in main.c must mark this region Non-Cacheable
@@ -266,8 +270,8 @@ SECTIONS
    * tinyml_init() calls memset(g_activations, 0, ...) before every
    * ai_network_create_and_init() to compensate for the missing startup zero.
    *
-   * g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE (~57 KB)
-   * RAM_D3 total: ~58 368 B (~57 KB) of 64 KB  ✅  (~7 KB free)
+   * g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE (41 152 B, X-CUBE-AI report)
+   * RAM_D3 total: 41 152 B (~40.2 KB) of 64 KB  ✅  (~23.8 KB free)
    */
   .tinyml_buf (NOLOAD) :
   {
