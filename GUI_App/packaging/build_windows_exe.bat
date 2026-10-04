@@ -4,7 +4,7 @@ cd /d "%~dp0\.."
 
 echo Installing build dependencies...
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt pyinstaller
+python -m pip install -r "..\requirements.txt" pyinstaller
 
 echo.
 echo Building Windows executable...
