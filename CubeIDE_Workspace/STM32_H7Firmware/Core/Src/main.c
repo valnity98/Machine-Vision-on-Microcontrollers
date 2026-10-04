@@ -16,7 +16,7 @@
 *                                             cvBinBuffer  (127.5 KB)
 *  RAM_D2   0x30000000  288 KB  .cvtmb_buf    cvTmpBuffer  (127.5 KB)
 *                               .cvbg_buf     cvBgBuffer   (127.5 KB)
-*  RAM_D3   0x38000000   64 KB  .tinyml_buf   g_activations (~57 KB)
+*  RAM_D3   0x38000000   64 KB  .tinyml_buf   g_activations (41 152 B = 40.2 KB)
 *
 * ── Buffer sizing rationale ──────────────────────────────────────────────────
 *

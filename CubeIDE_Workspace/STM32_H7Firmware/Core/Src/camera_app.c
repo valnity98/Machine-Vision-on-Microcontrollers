@@ -762,9 +762,10 @@ void camera_app_task(void *arg)
                     app->flash_enable = last_stat_flash;
                     flash_enabled(app);
                     /*
-                     * If the host sent STREAM 0 just before FLASH 1 + SNAP,
-                     * the stream task may still be clearing stream_enable.
-                     * Wait up to 50 ms for it to settle before aborting.
+                     * stream_enable is checked only once (above); there is
+                     * no wait for a pending STREAM 0.  With the flash LED
+                     * enabled, HAL_Delay(1000) lets it warm up for 1000 ms
+                     * before the snapshot is taken.
                      */
                     if (app->flash_enable) {
                         HAL_Delay(1000);   /* LED warm-up */

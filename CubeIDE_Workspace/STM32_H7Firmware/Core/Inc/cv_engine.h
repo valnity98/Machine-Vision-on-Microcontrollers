@@ -16,11 +16,11 @@
  * STM32IPL was evaluated and rejected for every CV stage because all
  * STM32IPL image functions require image_t wrappers and an internal heap
  * pool (STM32Ipl_InitLib), adding RAM overhead and non-determinism with
- * no accuracy benefit.  STM32Ipl_Resize() is used only in tinyml_preprocess.c.
+ * no accuracy benefit.
  *
  * Buffer contract (caller must allocate):
  *   work_bin (cvBinBuffer): proc_w * proc_h bytes, in .dcmi_buf → RAM_D1
- *   tmp_buf  (cvTmpBuffer): proc_w * proc_h bytes, in .dcmi_buf → RAM_D1
+ *   tmp_buf  (cvTmpBuffer): proc_w * proc_h bytes, in .cvtmb_buf → RAM_D2
  *   bg_buf   (cvBgBuffer) : proc_w * proc_h bytes, in .cvbg_buf → RAM_D2
  *   proc_w / proc_h = full capture size when ROI is disabled.
  */
@@ -230,8 +230,11 @@ void cv_capture_background(const uint16_t    *rgb565,
  * Preset loader
  *
  * Writes filter, threshold and morphology defaults for the given preset.
+ * It also always sets connectivity = 8 (for every preset, including CUSTOM,
+ * for which nothing else besides the preset id is written), so set
+ * connectivity (CV CON) after applying a preset.
  * Does NOT touch: enabled, bgsub_enabled, min/max_area, shape-filter
- * thresholds, border_filter_enabled, roi_*, connectivity.
+ * thresholds, border_filter_enabled, roi_*.
  * Those are always set manually.
  * ========================================================================= */
 void cv_apply_preset(cv_config_t *cfg, cv_preset_t preset);
