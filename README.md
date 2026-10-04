@@ -509,7 +509,7 @@ Not all X-CUBE-AI files are in the repository: `X-CUBE-AI/Target/` and the valid
 1. After cloning, open `CubeIDE_Workspace/STM32_H7Firmware/STM32_H7Firmware.ioc` in STM32CubeMX and run **Generate Code** (the X-CUBE-AI Target and validation files are generated and are not in the repo).
 2. Open the project in STM32CubeIDE, build and flash.
 
-The `.ioc` stores the absolute model path of the author's machine (that model file is not in the repo). If CubeMX cannot find it, select `quantized_model.tflite` again in the X-CUBE-AI settings (see the steps below).
+The `.ioc` refers to the model by a path starting with the placeholder `<repo-root>` (an experiments_outputs run folder that is not part of this repo). If CubeMX cannot find it, select `quantized_model.tflite` again in the X-CUBE-AI settings (see the steps below).
 
 ### Updating the model
 
