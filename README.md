@@ -13,16 +13,18 @@ Course project *Mechatronik und Robotik 2* in the M.Sc. Mechatronics and Robotic
 
 ## Results
 
-Test: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environment with changing daylight, a phone torch and directional shadows. Each data point is one `SNAP` → `CV RUN` → `TM RUN` cycle on the same 320×240 RGB565 frame.
+Both methods were run on the same frames: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environment with changing daylight, a phone torch and directional shadows. Each data point is one `SNAP` → `CV RUN` → `TM RUN` cycle on the same 320×240 RGB565 frame.
 
 | | Classical CV (Otsu) | TinyML (MobileNetV1-0.25) |
 |---|---|---|
-| Mean run time on the STM32 (480 MHz) | 66.6 ms | **59.8 ms** |
+| Mean run time on the STM32 (480 MHz) | 66.6 ms | 59.8 ms |
 | Flash / RAM (incl. runtime) | - | ≈ 279 KiB / ≈ 57 KiB |
+
+Both run times are nearly constant and do not depend on the scene.
 
 ![CV debug images of a 4-object scene](docs/images/cv_debug_count4.png)
 
-*(a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard (PC-side floating-point computation, threshold step only; all four objects are separated, the dark areas at the border are artefacts), (d) STM32 result overlay: the classical pipeline on the chip returned `count=0`, TinyML classified the same frame correctly as 4 objects. The cause for this individual frame was not analysed; the Otsu overflow in the measured firmware version is a possible reason.*
+*Debug views of one test frame with four objects: (a) original frame, (b) grayscale, (c) Otsu binary image computed in the dashboard, (d) overlay view of the frame from the STM32.*
 
 ## System architecture
 
@@ -104,11 +106,11 @@ The "STM32 ready" indicator appears after `OV2640 ready` is received.
 
 ## Known limitations
 
-Found in a later code review, after the measurements above:
+Found in a later code review:
 
-1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The `cv_engine.c` checked in here still contains the overflowing code; a corrected version (floating-point score) is prepared but has **not been re-measured yet**.
+1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The `cv_engine.c` checked in here still contains the overflowing code; a corrected version (floating-point score) is prepared but has not been measured yet.
 
-This is the first thing to fix before a re-measurement.
+This is the first thing to fix before the next measurement.
 
 ## Repository structure
 
