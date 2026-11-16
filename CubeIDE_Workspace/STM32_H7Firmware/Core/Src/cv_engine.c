@@ -391,20 +391,25 @@ void cv_apply_preset(cv_config_t *cfg, cv_preset_t preset)
 
 /* Convert the current RGB565 frame to grayscale and store in bg_buf.
  * Call with an empty scene (no objects) to establish the background reference. */
-void cv_capture_background(const uint16_t *rgb565,
-                            uint16_t width, uint16_t height,
-                            uint8_t *bg_buf, const cv_config_t *cfg)
+int cv_capture_background(const uint16_t *rgb565,
+                          uint16_t width, uint16_t height,
+                          uint8_t *bg_buf, const cv_config_t *cfg)
 {
     uint16_t proc_w = width, proc_h = height;
     uint16_t roi_x0 = 0u, roi_y0 = 0u;
 
-    if ((rgb565 == NULL) || (bg_buf == NULL) || (cfg == NULL)) { return; }
+    if ((rgb565 == NULL) || (bg_buf == NULL) || (cfg == NULL)) { return -1; }
 
     if (cfg->roi_enabled && (cfg->roi_w > 0u) && (cfg->roi_h > 0u)) {
+        /* Same checks as in cv_run_rgb565(). Without them, an ROI origin
+         * outside the frame makes (width - roi_x0) wrap to a huge proc_w and
+         * the loop below writes far beyond bg_buf. */
+        if ((cfg->roi_x >= width) || (cfg->roi_y >= height)) { return -4; }
         roi_x0 = cfg->roi_x; roi_y0 = cfg->roi_y;
         proc_w = cfg->roi_w; proc_h = cfg->roi_h;
         if ((uint32_t)roi_x0 + proc_w > width)  { proc_w = (uint16_t)(width  - roi_x0); }
         if ((uint32_t)roi_y0 + proc_h > height) { proc_h = (uint16_t)(height - roi_y0); }
+        if ((proc_w == 0u) || (proc_h == 0u)) { return -5; }
     }
 
     for (uint16_t y = 0u; y < proc_h; ++y) {
@@ -413,6 +418,7 @@ void cv_capture_background(const uint16_t *rgb565,
             bg_buf[(uint32_t)y * proc_w + x] = cv_rgb565_to_gray(rgb565[si]);
         }
     }
+    return 0;
 }
 
 /* =========================================================================
@@ -553,6 +559,11 @@ int cv_run_rgb565(const uint16_t    *rgb565,
         for (uint16_t i = 0u; i < curr_count; ++i) {
             uint16_t assigned = 0u;
             for (uint16_t j = 0u; j < prev_count; ++j) {
+                /* Label 0 marks a run that got no label because the component
+                 * table was full. It must not be used as a real label here,
+                 * otherwise valid components are merged into the unused
+                 * comp[0] and disappear from the result. */
+                if (prev_runs[j].label == 0u) { continue; }
                 uint16_t px0 = prev_runs[j].x0;
                 uint16_t px1 = prev_runs[j].x1;
                 if (cfg->connectivity == 8u) {

@@ -190,8 +190,11 @@ static void handle_cv(camera_app_t *app, char *sub)
          * correctly.  A raw memcpy would be wrong because frame_buf holds
          * 2 bytes/pixel (RGB565) while bg_buf expects 1 byte/pixel (luma).
          */
-        cv_capture_background((const uint16_t *)app->frame_buf,
-                              bw, bh, app->bg_buf, &app->cv_cfg);
+        if (cv_capture_background((const uint16_t *)app->frame_buf,
+                                  bw, bh, app->bg_buf, &app->cv_cfg) != 0) {
+            camproto_send_err(app->uart, "BGCAP failed: CV ROI outside frame");
+            return;
+        }
         app->bg_captured = 1u;
         camproto_send_cv_config(app);
         camproto_send_info(app->uart, "BGCAP done");
@@ -468,6 +471,10 @@ void camera_stream_task(void *arg)
     for (;;) {
         xEventGroupWaitBits(app->stream_events, STREAM_EV_START,
                             pdTRUE, pdFALSE, portMAX_DELAY);
+        /* A "STREAM 0" received while no stream was running leaves the STOP
+         * bit set. Clear it, otherwise this stream would end after its first
+         * frame. */
+        (void)xEventGroupClearBits(app->stream_events, STREAM_EV_STOP);
 
         if (!camcap_stream_config_supported(app)) {
             camproto_send_err(app->uart,
@@ -719,11 +726,14 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart, "ZOOM 1|2|4");
                     break;
                 }
-                uint8_t lvl = (uint8_t)atoi(arg1);
-                if ((lvl != 1u) && (lvl != 2u) && (lvl != 4u)) {
+                /* Validate as int: a cast to uint8_t first would accept
+                 * values such as 257 as 1. */
+                int lvl_arg = atoi(arg1);
+                if ((lvl_arg != 1) && (lvl_arg != 2) && (lvl_arg != 4)) {
                     camproto_send_err(app->uart, "ZOOM 1|2|4");
                     break;
                 }
+                uint8_t lvl = (uint8_t)lvl_arg;
                 if (app->pixfmt == OV2640_PIXFMT_JPEG) {
                     camproto_send_err(app->uart, "ZOOM RGB only");
                     break;
@@ -733,10 +743,14 @@ void camera_app_task(void *arg)
                     /* Restore native ZMOW/ZMOH so OV2640 outputs the full frame again. */
                     uint16_t fw0, fh0;
                     camcap_rgb_dims_from_res(app->res, &fw0, &fh0);
-                    (void)ov2640_set_zoom(&app->cam, fw0, fh0);
+                    HAL_StatusTypeDef zst0 = ov2640_set_zoom(&app->cam, fw0, fh0);
                     app->zoom_w = 0u;
                     app->zoom_h = 0u;
-                    camproto_send_info(app->uart, "zoom ok");
+                    if (zst0 == HAL_OK) {
+                        camproto_send_info(app->uart, "zoom ok");
+                    } else {
+                        camproto_send_err(app->uart, "zoom hw err");
+                    }
                     break;
                 }
                 uint16_t fw, fh;

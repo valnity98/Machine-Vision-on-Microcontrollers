@@ -219,12 +219,16 @@ int cv_run_rgb565(const uint16_t    *rgb565,
  * Converts the current RGB565 frame to grayscale and stores it in bg_buf.
  * Call with an empty scene (no objects on the tray / conveyor).
  * bg_buf must be at least proc_w * proc_h bytes.
+ *
+ * Returns 0 on success, -1 for a NULL argument, -4 if the ROI origin lies
+ * outside the frame, -5 if the ROI is empty (same codes as cv_run_rgb565).
+ * Nothing is written to bg_buf unless 0 is returned.
  * ========================================================================= */
-void cv_capture_background(const uint16_t    *rgb565,
-                            uint16_t           width,
-                            uint16_t           height,
-                            uint8_t           *bg_buf,
-                            const cv_config_t *cfg);
+int cv_capture_background(const uint16_t    *rgb565,
+                          uint16_t           width,
+                          uint16_t           height,
+                          uint8_t           *bg_buf,
+                          const cv_config_t *cfg);
 
 /* =========================================================================
  * Preset loader

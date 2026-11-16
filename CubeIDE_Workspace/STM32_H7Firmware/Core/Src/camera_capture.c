@@ -262,6 +262,11 @@ void camcap_do_snapshot(camera_app_t *app)
             return;
         }
 
+        /* The capture overwrites frame_buf. If it fails, the buffer no longer
+         * holds a complete frame, so the old frame must not stay marked valid
+         * for CV RUN / TM RUN. */
+        camcap_invalidate_last_rgb(app);
+
         uint32_t t0 = HAL_GetTick();
         if (ov2640_capture_rgb565_frame(&app->cam,
                 (uint32_t)app->frame_buf, w, h, 5000u) != HAL_OK) {
