@@ -84,7 +84,11 @@ class DisplayMixin:
         return pil_to_qimage_rgb(binary)
 
     def _local_otsu(self, pil_gray) -> int:
-        """Compute Otsu threshold locally (matches STM32 cv_otsu_threshold)."""
+        """Compute Otsu threshold locally (same arithmetic as the STM32 cv_otsu_threshold).
+
+        Returns the first grey level that belongs to the foreground, so the
+        caller can use ``p >= thr``.
+        """
         try:
             hist = [0] * 256
             for p in pil_gray.getdata():
@@ -95,22 +99,22 @@ class DisplayMixin:
             sum_total = sum(i * hist[i] for i in range(256))
             sum_bg = 0
             weight_bg = 0
-            max_var = 0.0
+            max_var = -1.0
             best_thr = 128
-            for t in range(256):
+            for t in range(255):
                 weight_bg += hist[t]
+                sum_bg += t * hist[t]
                 if weight_bg == 0:
                     continue
                 weight_fg = total - weight_bg
                 if weight_fg == 0:
                     break
-                sum_bg += t * hist[t]
                 mean_bg = sum_bg / weight_bg
                 mean_fg = (sum_total - sum_bg) / weight_fg
                 var = weight_bg * weight_fg * (mean_bg - mean_fg) ** 2
                 if var > max_var:
                     max_var = var
-                    best_thr = t
+                    best_thr = t + 1
             return best_thr
         except Exception:
             return 128

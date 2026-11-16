@@ -149,26 +149,39 @@ static void cv_median_filter(const uint8_t *src, uint8_t *dst,
  * Stage 4 — Thresholding
  * ========================================================================= */
 
-/* Otsu's method — histogram on stack (1 KB), no heap required. */
+/* Otsu's method — histogram on stack (1 KB), no heap required.
+ *
+ * Maximises the between-class variance  w_back * w_fore * (mu_back - mu_fore)^2.
+ * The score is computed in double (the H7 has a double-precision FPU): for a
+ * QVGA frame w_back * w_fore reaches 1.5e9 and the squared mean difference
+ * 6.5e4, so the product needs about 1e14 — an integer version would have to
+ * square a 40-bit difference, which does not fit into 64 bits.
+ *
+ * Returns the first level that belongs to the foreground, so the caller can
+ * keep using "pixel >= threshold". Pixels equal to the best split level t are
+ * background (class 0..t), therefore the returned value is t + 1.
+ * An image with a single grey level has no split; 128 is returned then. */
 static uint8_t cv_otsu_threshold(const uint8_t *gray, uint32_t n)
 {
     uint32_t hist[256];
     uint64_t sum_total  = 0u, sum_back = 0u;
     uint32_t weight_back = 0u, best_thr = 128u;
-    uint64_t best_score  = 0u;
+    double   best_score  = -1.0;
 
     memset(hist, 0, sizeof(hist));
     for (uint32_t i = 0u; i < n; ++i) { ++hist[gray[i]]; sum_total += gray[i]; }
 
-    for (uint32_t t = 0u; t < 256u; ++t) {
+    for (uint32_t t = 0u; t < 255u; ++t) {
         weight_back += hist[t];
+        sum_back    += (uint64_t)t * hist[t];
         if (weight_back == 0u) { continue; }
         uint32_t weight_fore = n - weight_back;
         if (weight_fore == 0u) { break; }
-        sum_back    += (uint64_t)t * hist[t];
-        uint64_t diff  = sum_back * n - sum_total * weight_back;
-        uint64_t score = (diff * diff) / ((uint64_t)weight_back * weight_fore);
-        if (score > best_score) { best_score = score; best_thr = t; }
+        double mean_back = (double)sum_back / (double)weight_back;
+        double mean_fore = (double)(sum_total - sum_back) / (double)weight_fore;
+        double d         = mean_back - mean_fore;
+        double score     = (double)weight_back * (double)weight_fore * d * d;
+        if (score > best_score) { best_score = score; best_thr = t + 1u; }
     }
     return (uint8_t)best_thr;
 }
