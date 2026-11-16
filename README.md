@@ -63,7 +63,7 @@ flowchart LR
 | RAM_D1 | 512 KB | Frame buffer (255 KB) + CV binary buffer (128 KB) |
 | RAM_D2 | 288 KB | CV temp buffer (128 KB) + CV background buffer (128 KB) |
 | RAM_D3 | 64 KB | TinyML activation buffer (40 KB) |
-| Flash | 2 MB | X-CUBE-AI runtime + network: 285,355 B (≈ 279 KiB), thereof weights 219,844 B (214.7 KiB) |
+| Flash | 2 MB | X-CUBE-AI runtime + network: 285,355 B (≈ 279 KiB), of which weights 219,844 B (214.7 KiB) |
 
 ## Quick start: GUI
 

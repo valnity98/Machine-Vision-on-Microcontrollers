@@ -20,18 +20,13 @@ Back to the [README](../README.md).
 ## Dependencies
 
 ```
-PySide6>=6.6.0          GUI + serial port
-pyserial>=3.5
+PySide6>=6.6.0          GUI + serial port (QtSerialPort)
 Pillow>=10.3.0
 tensorflow==2.16.2      training + TFLite quantisation
 numpy>=1.24.0,<2.0
-pandas>=2.0.0
-mlflow>=2.11.0
-matplotlib>=3.8.0
-pyyaml>=6.0
-omegaconf>=2.3.0
-tqdm>=4.66.0
 ```
+
+Python 3.10 to 3.12. The ST Model Zoo workflow needs its own environment (see [training.md](training.md)).
 
 ```bash
 pip install -r requirements.txt

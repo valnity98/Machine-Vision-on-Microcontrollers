@@ -1,9 +1,12 @@
 # STM32 Edge Vision — unified requirements
 #
 # Covers both the PC-side Reference Dashboard (PySide6 GUI) and the
-# ML training / TFLite verification workflow.
+# scripts in "ML training/src" (training, dataset check, TFLite verification).
 #
-# Python 3.10 or 3.11 recommended (TensorFlow 2.16 requires Python ≤ 3.11).
+# Python 3.10 to 3.12 (TensorFlow 2.16.2 has no wheels for Python 3.13+).
+#
+# The ST Model Zoo training workflow has its own requirements file and needs
+# its own environment; see docs/training.md.
 #
 # Quick start:
 #   python -m venv .venv
@@ -13,7 +16,6 @@
 
 # ── GUI (Reference Dashboard) ────────────────────────────────────────────────
 PySide6>=6.6.0          # Qt widgets + QtSerialPort (included)
-pyserial>=3.5           # fallback serial access / port enumeration
 
 # ── Image handling ───────────────────────────────────────────────────────────
 Pillow>=10.3.0
@@ -23,19 +25,5 @@ tensorflow==2.16.2      # training, TFLite converter, PTQ quantisation
 # Lighter alternative for inference only (no training):
 # ai-edge-litert>=1.0.1
 
-# ── Data / numerics ──────────────────────────────────────────────────────────
+# ── Numerics ─────────────────────────────────────────────────────────────────
 numpy>=1.24.0,<2.0      # TF 2.16 is not compatible with numpy 2.x
-pandas>=2.0.0           # CSV export for benchmark results
-
-# ── Experiment tracking (ST Model Zoo MLflow integration) ────────────────────
-mlflow>=2.11.0
-
-# ── Visualisation ────────────────────────────────────────────────────────────
-matplotlib>=3.8.0
-
-# ── YAML / Hydra config (ST Model Zoo) ──────────────────────────────────────
-pyyaml>=6.0
-omegaconf>=2.3.0
-
-# ── Utilities ────────────────────────────────────────────────────────────────
-tqdm>=4.66.0

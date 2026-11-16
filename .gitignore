@@ -31,8 +31,6 @@ ML training/dataset/
 # Trained models: generated artefacts — reproduce via training
 ML training/Model/stm32ai-modelzoo-services/
 ML training/outputs/
-# Keep .gitkeep placeholder
-!ML training/outputs/.gitkeep
 
 # ── X-CUBE-AI — validation / test framework (not needed for deployment) ──────
 CubeIDE_Workspace/**/X-CUBE-AI/App/aiPbIO.*

@@ -36,9 +36,9 @@ dataset:
 
 preprocessing:
   # rescaling is the float normalisation applied during training.
-  # The quantized model (uint8 input, QLinear scale=1/127.5, zero_point=127)
-  # embeds this normalisation in the first Conv2D layer.
-  # The STM32 firmware sends raw uint8 [0..255] — X-CUBE-AI handles the rest.
+  # In the quantized model this normalisation is carried by the quantisation
+  # parameters of the uint8 input tensor (scale=1/127.5, zero_point=127).
+  # The STM32 firmware therefore feeds raw uint8 [0..255] into the network.
   rescaling: { scale: 1/127.5, offset: -1 }
   resizing:
     interpolation: nearest     # Must match STM32 tinyml_preprocess.c (integer-floor NN)

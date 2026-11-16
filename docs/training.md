@@ -109,7 +109,7 @@ pip install -r requirements.txt
 
 # 4. Train + quantise (chain_tqe) - stm32ai_main.py is in image_classification/ (not in tf/)
 #    --config-path is resolved relative to the folder of stm32ai_main.py:
-#    ../.. = "ML training/Model" (where user_config.yaml lies). An absolute path also works.
+#    ../.. = "ML training/Model" (where user_config.yaml is located). An absolute path also works.
 cd image_classification
 python stm32ai_main.py \
     --config-path ../.. \
@@ -164,7 +164,7 @@ python stm32ai_main.py \
     --config-name user_config.yaml
 ```
 
-`stm32ai_main.py` is located in `image_classification/` (not in `tf/`). Hydra resolves `--config-path` relative to the folder of `stm32ai_main.py`, so `../..` points to `ML training/Model` (where `user_config.yaml` lies); an absolute path works as well. The output folder comes from `hydra: run: dir:` in `user_config.yaml`, a path relative to the working directory. Started from `image_classification/`, the result is:
+`stm32ai_main.py` is located in `image_classification/` (not in `tf/`). Hydra resolves `--config-path` relative to the folder of `stm32ai_main.py`, so `../..` points to `ML training/Model` (where `user_config.yaml` is located); an absolute path works as well. The output folder comes from `hydra: run: dir:` in `user_config.yaml`, a path relative to the working directory. Started from `image_classification/`, the result is:
 
 `image_classification/tf/src/experiments_outputs/<timestamp>/quantized_models/quantized_model.tflite`
 
