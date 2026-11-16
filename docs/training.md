@@ -43,20 +43,24 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 
 ## Training results
 
-**Run:** `2026_05_03_09_11_10`, ST Model Zoo `chain_tqe` (train → quantise → evaluate)
+**Run:** `2026_06_27_20_08_38`, ST Model Zoo `chain_tqe` (train → quantise → evaluate). This is the model that is flashed on the board: a byte comparison of its weight tensors with `X-CUBE-AI/App/network_data_params.c` (four 24-byte windows per tensor) finds every window, and `network_generate_report.txt` names this run folder.
 
 | Metric | Value |
 |--------|-------|
-| Best validation accuracy | **97.14 %** (epochs 35, 36, 43, 44) |
-| Best training accuracy | **99.97 %** (epoch 55) |
-| Validation accuracy in the last logged epoch | **94.29 %** (epoch 55) |
-| Training epochs | 56 logged (epochs 0–55, up to 100 configured; early stopping, patience 20) |
-| LR schedule | 1e-3 → 5e-4 (ep 30) → 2.5e-4 (ep 44) → 1.25e-4 (ep 52) |
+| Accuracy of the float model on the validation set | **82.8 %** (207 of 250 images) |
+| Accuracy of the quantised (uint8) model on the same set | **82.4 %** (206 of 250 images) |
+| Best validation accuracy during training | 82.8 % (epoch 26; epoch 33 reached 80.4 %) |
+| Validation accuracy in the last epoch | 70.8 % (epoch 46) |
+| Median validation accuracy, epochs 20–46 | 72.4 % (range 65.6 % to 82.8 %) |
+| Training accuracy, last epoch | 94.3 % (with augmentation) |
+| Training epochs | 47 logged (0–46, up to 100 configured; early stopping, patience 20) |
+| Training time | 996 s (21.2 s per epoch) |
+| LR schedule | 1e-3 → 5e-4 (ep 35) → 2.5e-4 (ep 43) |
 | Framework | TensorFlow 2 / Keras, ST Model Zoo |
 
-![Training curves](../ML%20training/Model/2026_05_03_09_11_10/Training_curves.png)
+![Training curves](../ML%20training/Model/2026_06_27_20_08_38/Training_curves.png)
 
-> Both validation values are correct and describe different epochs: 97.14 % is the best epoch, 94.29 % the last logged one. All validation accuracies in `train_metrics.csv` are multiples of 1/350, so 97.14 % corresponds to 340 of 350 and 94.29 % to 330 of 350 validation images (derived from the CSV; the dataset is not in the repo), i.e. a difference of 10 images. `user_config.yaml` sets `restore_best_weights: true`, so Keras restores the weights of the best epoch when early stopping ends the training; which saved checkpoint the Model Zoo passed on to the quantiser was not verified.
+> How to read these numbers: the validation accuracy jumps between epochs by up to 10 points, and 82.8 % is a single-epoch peak. `restore_best_weights: true` restores the weights of that epoch (the Model Zoo log reports 82.8 % for the float model, not the 70.8 % of the last epoch, so the restored weights were evaluated). The same 250 images chose the checkpoint and report the result, so 82.4 % is an optimistic estimate for new frames. All validation accuracies in `train_metrics.csv` are multiples of 1/250 (derived from the CSV; the dataset is not in the repo). The gap to the training accuracy (94.3 %) shows that the model overfits the small dataset.
 
 > Training on real OV2640 frames captured with the Dataset Capture tool.  
 > Training and firmware use the same preprocessing mode: full-frame stretch (`aspect_ratio: fit`), nearest-neighbour interpolation, RGB. The exact pixel mapping of TensorFlow's nearest resize and of the firmware's integer-floor mapping was not compared.
@@ -120,7 +124,7 @@ python stm32ai_main.py \
 #    experiments_outputs/<timestamp> to "ML training/Model/<timestamp>" first,
 #    or point --model to the file in experiments_outputs)
 python "ML training/src/predict_count_tflite.py" \
-    --model "ML training/Model/2026_05_03_09_11_10/quantized_models/quantized_model.tflite" \
+    --model "ML training/Model/2026_06_27_20_08_38/quantized_models/quantized_model.tflite" \
     --image path/to/frame.png \
     --show-hash
 ```
@@ -172,7 +176,7 @@ python stm32ai_main.py \
 
 ```bash
 python "ML training/src/predict_count_tflite.py" \
-    --model "ML training/Model/2026_05_03_09_11_10/quantized_models/quantized_model.tflite" \
+    --model "ML training/Model/2026_06_27_20_08_38/quantized_models/quantized_model.tflite" \
     --image path/to/frame.png --show-hash
 ```
 

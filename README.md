@@ -106,11 +106,8 @@ The "STM32 ready" indicator appears after `OV2640 ready` is received.
 
 ## Known limitations
 
-Found in a later code review:
-
-1. **Otsu overflow in the firmware (`cv_engine.c`, `cv_otsu_threshold`).** The between-class score is squared in `uint64_t` and overflows for typical QVGA histograms. In a simulation of the exact C arithmetic, a scene with a bright background and dark objects gave a threshold of 46 instead of 92. The `cv_engine.c` checked in here still contains the overflowing code; a corrected version (floating-point score) is prepared but has not been measured yet.
-
-This is the first thing to fix before the next measurement.
+- **Not re-measured after the last code review.** A review found four firmware errors that are fixed in the code now: an overflow in the Otsu score (`cv_otsu_threshold`) plus an off-by-one at the threshold, protocol lines longer than 191 characters (`CVCFG`) that were cut without a line break, a busy-wait of 1 s in `SNAP` that blocked the UART task, and a background reference that was used after the ROI or resolution had changed. The fixes were checked on the PC only (compiled, and the Otsu arithmetic compared with a Python model); they have not been run on the board. The 66.6 ms for the CV pipeline was measured before the Otsu fix and should be measured again.
+- **TinyML accuracy is a rough figure.** 82.4 % on 250 validation images that also selected the checkpoint; the validation curve is noisy (see [docs/training.md](docs/training.md)).
 
 ## Repository structure
 
@@ -172,10 +169,10 @@ Machine-Vision-on-Microcontrollers/
 │  │  └─ check_dataset.py                # Dataset structure validator
 │  └─ Model/
 │     ├─ user_config.yaml                # ST Model Zoo training config
-│     └─ 2026_05_03_09_11_10/            # Training run artefacts
+│     └─ 2026_06_27_20_08_38/            # Training run that is flashed on the board
 │        ├─ Training_curves.png          # Loss / accuracy curves
 │        ├─ logs/metrics/train_metrics.csv
-│        └─ quantized_models/quantized_model.tflite   # ← deployable model (304,216 B ≈ 297 KiB; the weights alone are 214.7 KiB)
+│        └─ quantized_models/quantized_model.tflite   # ← deployed model (304,216 B ≈ 297 KiB; the weights alone are 214.7 KiB)
 │
 ├─ requirements.txt                      # Unified Python dependencies
 └─ README.md

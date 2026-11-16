@@ -38,7 +38,7 @@ flowchart TD
 | `CV MAXAREA n` | Maximum object area (0=unlimited) |
 | `CV ASPECT min max` | Aspect ratio filter (×1000) |
 | `CV CIRC min` | Circularity minimum (×1000, edge-count based metric) |
-| `CV BGCAP` | Capture current frame as background |
+| `CV BGCAP` | Capture current frame as background (for the current frame size and ROI; `CV RUN` discards it with a warning when either has changed) |
 | `CV BGSUB 0\|1` | Enable background subtraction |
 | `CV BORDFILT 0\|1` | Reject large blobs touching the border (≥ 85 % of width/height or ≥ 35 % of the area) |
 | `CV ROI 1 x y w h` | Set region of interest |
@@ -105,5 +105,5 @@ For a **reproducible CV vs TinyML comparison**:
 | CV RUN (Otsu, QVGA) | 66.6 ms (± 0.5 ms) |
 | TM RUN (inference) | 59.8 ms (± 0.2 ms) |
 
-Both run times are nearly constant and independent of the scene.
+Both run times are nearly constant and independent of the scene. The CV time was measured before the Otsu fix (see the README, *Known limitations*); the fix only changes the 256-step loop over the histogram, so a large change is not expected, but it has not been measured.
 
