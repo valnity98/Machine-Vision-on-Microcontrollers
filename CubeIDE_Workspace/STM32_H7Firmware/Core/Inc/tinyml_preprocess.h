@@ -13,8 +13,9 @@
  *   3. Write HWC: dst[oy * W * 3 + ox * 3 + c].
  *
  * The model expects uint8 input with QLinear(1/127.5, 127).
- * MobileNet normalisation is embedded in the first Conv2D by X-CUBE-AI,
- * so raw [0..255] uint8 values are passed directly — no float conversion.
+ * The MobileNet normalisation is carried by these input quantisation
+ * parameters, so raw [0..255] uint8 values are passed directly — no float
+ * conversion.
  */
 
 #ifndef INC_TINYML_PREPROCESS_H_

@@ -181,8 +181,8 @@ static int run_inference(ai_buffer *ai_in, ai_buffer *ai_out, tinyml_result_t *r
     out_data = (const float *)ai_out[0].data;
 
     /* Apply softmax when the output is not already a valid probability distribution.
-     * softmax_buf is function-static (non-reentrant); safe on bare-metal
-     * single-threaded inference. */
+     * softmax_buf is function-static (non-reentrant); that is safe because
+     * inference is only ever run from the camera application task. */
     {
         static float softmax_buf[TINYML_NUM_CLASSES];
         float   prob_sum = 0.0f, sum_exp = 0.0f, max_val = out_data[0];
