@@ -3,7 +3,7 @@
 check_dataset.py
 ================
 Validate the dataset folder structure required by the STM32 AI Model Zoo
-image_classification workflow and by predict_count_tflite.py.
+image_classification workflow and by train_count_model.py.
 
 Expected layout:
   <root>/
@@ -21,7 +21,7 @@ Expected layout:
       ...
 
 Usage:
-  python check_dataset.py --root "ML training/dataset"
+  python "ML training/src/check_dataset.py" --root "ML training/dataset"
 """
 
 from __future__ import annotations
@@ -34,6 +34,9 @@ EXPECTED_CLASSES = ["count_0", "count_1", "count_2", "count_3", "count_4"]
 EXPECTED_SPLITS  = ["train", "val"]
 OPTIONAL_SPLITS  = ["test"]
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp"}
+
+# Recommended minimum number of images per class (see docs/DATASET_GUIDE.md)
+RECOMMENDED_PER_CLASS = {"train": 100, "val": 20}
 
 
 def check_split(root: Path, split: str, required: bool) -> tuple[dict[str, int], list[str]]:
@@ -61,16 +64,18 @@ def check_split(root: Path, split: str, required: bool) -> tuple[dict[str, int],
             continue
 
         imgs = [f for f in cls_dir.iterdir()
-                if f.suffix.lower() in IMAGE_EXTENSIONS]
+                if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS]
         counts[cls] = len(imgs)
 
+        recommended = RECOMMENDED_PER_CLASS.get(split, 0)
         if len(imgs) == 0:
             print(f"    ERROR   EMPTY   {cls:12s}  (0 images)")
             errors.append(f"{split}/{cls}: no images")
-        elif len(imgs) < 10:
-            print(f"    WARNING FEW     {cls:12s}  ({len(imgs)} images - recommend >= 50)")
+        elif len(imgs) < recommended:
+            print(f"    WARNING FEW     {cls:12s}  "
+                  f"({len(imgs)} images - recommend >= {recommended})")
         else:
-            print(f"    OK      OK      {cls:12s}  ({len(imgs)} images)")
+            print(f"    OK              {cls:12s}  ({len(imgs)} images)")
 
     # Check for unexpected class folders
     actual_classes = {d.name for d in split_dir.iterdir() if d.is_dir()}
@@ -133,10 +138,13 @@ def main() -> None:
     total_train = sum(all_counts.get("train", {}).values())
     total_val   = sum(all_counts.get("val",   {}).values())
     print(f"\n  Total train: {total_train}  |  Total val: {total_val}")
-    if total_train < 100:
-        print("  WARNING Very few training images - model may overfit. Recommend >= 50 per class.")
-    if total_val < 25:
-        print("  WARNING Very few validation images. Recommend >= 10 per class.")
+    n_classes = len(EXPECTED_CLASSES)
+    if total_train < RECOMMENDED_PER_CLASS["train"] * n_classes:
+        print("  WARNING Few training images - model may overfit. "
+              f"Recommend >= {RECOMMENDED_PER_CLASS['train']} per class.")
+    if total_val < RECOMMENDED_PER_CLASS["val"] * n_classes:
+        print("  WARNING Few validation images. "
+              f"Recommend >= {RECOMMENDED_PER_CLASS['val']} per class.")
 
     if problems:
         print(f"\nFAILED: {len(problems)} problem(s) found:")

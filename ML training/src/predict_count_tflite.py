@@ -5,9 +5,13 @@ predict_count_tflite.py
 Run the quantized MobileNetV1 counting model on a single image or a folder
 of images and print the class predictions.
 
-The preprocessing pipeline is intentionally identical to the STM32 firmware
-(tinyml_preprocess.c) so you can cross-check STM32 TM_IN diagnostics against
-the PC output.
+The resize is the same as in the STM32 firmware (tinyml_preprocess.c), so the
+PC output can be compared with the STM32 TM_IN diagnostics. The pixel values
+can still differ by 1 LSB: the firmware expands RGB565 to 8 bit by rounding
+down, while the PNGs saved by the dashboard are expanded with rounding to
+nearest. Because of that, the hash printed by --show-hash usually does not
+equal the hash in the TM_IN line; compare min/max/mean and the predictions
+instead.
 
 Usage
 -----
@@ -41,10 +45,11 @@ INPUT_W      = 96
 INPUT_H      = 96
 INPUT_C      = 3
 CLASS_NAMES  = ["count_0", "count_1", "count_2", "count_3", "count_4"]
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp"}
 
 
 # ---------------------------------------------------------------------------
-# Preprocessing — matches tinyml_preprocess.c exactly
+# Preprocessing — same resize as tinyml_preprocess.c
 # ---------------------------------------------------------------------------
 
 def preprocess_image(img: Image.Image) -> np.ndarray:
@@ -116,7 +121,8 @@ def run_tflite(model_path: str, inp: np.ndarray) -> np.ndarray:
 
 
 def predict(model_path: str, img_path: str,
-            show_hash: bool = False) -> tuple[str, float, np.ndarray]:
+            show_hash: bool = False) -> tuple[int, float, np.ndarray]:
+    """Run the model on one image. Returns (class index, score, all scores)."""
     img = Image.open(img_path)
     inp = preprocess_image(img)
 
@@ -129,7 +135,7 @@ def predict(model_path: str, img_path: str,
 
     scores = run_tflite(model_path, inp)
     best   = int(np.argmax(scores))
-    return CLASS_NAMES[best], float(scores[best]), scores
+    return best, float(scores[best]), scores
 
 
 # ---------------------------------------------------------------------------
@@ -139,16 +145,14 @@ def predict(model_path: str, img_path: str,
 def main() -> None:
     ap = argparse.ArgumentParser(description="TFLite counting model predictor")
     ap.add_argument("--model",  required=True, help="Path to quantized_model.tflite")
-    ap.add_argument("--image",  help="Single image file (PNG/JPG)")
-    ap.add_argument("--folder", help="Folder of images")
-    ap.add_argument("--true-class", dest="true_class",
-                    help="Expected class name for accuracy reporting")
+    source = ap.add_mutually_exclusive_group(required=True)
+    source.add_argument("--image",  help="Single image file (PNG/JPG)")
+    source.add_argument("--folder", help="Folder of images")
+    ap.add_argument("--true-class", dest="true_class", choices=CLASS_NAMES,
+                    help="Expected class name for accuracy reporting (with --folder)")
     ap.add_argument("--show-hash", action="store_true",
                     help="Print input tensor hash / statistics for STM32 cross-check")
     args = ap.parse_args()
-
-    if not args.image and not args.folder:
-        ap.error("Provide --image or --folder")
 
     model = args.model
     if not Path(model).exists():
@@ -156,25 +160,35 @@ def main() -> None:
         sys.exit(1)
 
     if args.image:
-        name, conf, scores = predict(model, args.image, args.show_hash)
+        best, conf, scores = predict(model, args.image, args.show_hash)
         print(f"\n{args.image}")
-        print(f"  Prediction : {name}  ({conf*100:.1f}%)")
+        print(f"  Prediction : {CLASS_NAMES[best]}  ({conf*100:.1f}%)")
         for i, s in enumerate(scores):
-            marker = "  <--" if i == int(name[-1]) else ""
+            marker = "  <--" if i == best else ""
             print(f"    {CLASS_NAMES[i]}: {s*100:.1f}%{marker}")
 
-    elif args.folder:
-        folder  = Path(args.folder)
-        images  = sorted(folder.glob("*.png")) + sorted(folder.glob("*.jpg"))
+    else:
+        folder = Path(args.folder)
+        if not folder.is_dir():
+            print(f"ERROR: folder not found: {folder}")
+            sys.exit(1)
+        images = sorted(p for p in folder.iterdir()
+                        if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS)
+        if not images:
+            print(f"ERROR: no images found in: {folder}")
+            sys.exit(1)
+
         correct = 0
         for p in images:
-            name, conf, _ = predict(model, str(p), args.show_hash)
+            best, conf, _ = predict(model, str(p), args.show_hash)
+            name = CLASS_NAMES[best]
             ok = (name == args.true_class) if args.true_class else None
-            flag = "✓" if ok else ("✗" if ok is False else "")
+            # ASCII only: the Windows console code page cannot print check marks.
+            flag = "" if ok is None else ("OK" if ok else "XX")
             print(f"{flag:2} {p.name:40s}  -> {name}  ({conf*100:.1f}%)")
             if ok:
                 correct += 1
-        if args.true_class and images:
+        if args.true_class:
             print(f"\nAccuracy: {correct}/{len(images)} = {100*correct/len(images):.1f}%")
 
 

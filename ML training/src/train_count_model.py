@@ -103,7 +103,6 @@ import random
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import tensorflow as tf
@@ -168,6 +167,7 @@ class ImageSequence(keras.utils.Sequence):
         seed: int,
         apply_rgb565: bool,
     ) -> None:
+        super().__init__()
         if len(image_paths) != len(labels):
             raise ValueError("image_paths and labels must have the same length.")
         self.image_paths = image_paths
@@ -383,12 +383,17 @@ def compute_class_weights(labels: list[int]) -> dict[int, float]:
 
 
 def simulate_rgb565(rgb_0_255: np.ndarray) -> np.ndarray:
-    """Simulate RGB565 quantization and expansion back to 8-bit RGB."""
-    image = rgb_0_255.astype(np.float32, copy=False)
-    out = np.empty_like(image, dtype=np.float32)
-    out[..., 0] = np.round(image[..., 0] * 31.0 / 255.0) * (255.0 / 31.0)
-    out[..., 1] = np.round(image[..., 1] * 63.0 / 255.0) * (255.0 / 63.0)
-    out[..., 2] = np.round(image[..., 2] * 31.0 / 255.0) * (255.0 / 31.0)
+    """Simulate RGB565 quantization and expansion back to 8-bit RGB.
+
+    Integer arithmetic, so the expansion rounds down exactly like
+    rgb565_expand() in tinyml_preprocess.c. (In float32, 63 * (255 / 63) is
+    slightly below 255 and a full-scale green value would end up as 254.)
+    """
+    value = np.clip(np.rint(rgb_0_255), 0, 255).astype(np.uint16)
+    out = np.empty(value.shape, dtype=np.float32)
+    for channel, levels in enumerate((31, 63, 31)):  # R: 5 bit, G: 6 bit, B: 5 bit
+        quantized = (value[..., channel] * levels + 127) // 255
+        out[..., channel] = quantized * 255 // levels
     return out
 
 
@@ -422,7 +427,7 @@ def save_preprocessed_previews(image_paths: list[Path], artifacts_root: Path, *,
 
     for path in image_paths[:max_count]:
         preview = preprocess_image_to_uint8(path, apply_rgb565=apply_rgb565)
-        Image.fromarray(preview, mode="RGB").save(preview_dir / f"{path.stem}_input96_rgb.png")
+        Image.fromarray(preview).save(preview_dir / f"{path.stem}_input96_rgb.png")
 
 
 # ---------------------------------------------------------------------------
@@ -592,7 +597,8 @@ def main() -> int:
         write_labels(args.artifacts)
         return 0
 
-    create_project_dirs(args.dataset, args.artifacts)
+    # The dataset folders are not created here: validate_dataset() has to see
+    # what is really on disk, so that a wrong --dataset path is reported.
     train_paths, train_labels, val_paths, val_labels = validate_dataset(args.dataset)
     write_labels(args.artifacts)
     save_preprocessed_previews(train_paths, args.artifacts, apply_rgb565=apply_rgb565)
