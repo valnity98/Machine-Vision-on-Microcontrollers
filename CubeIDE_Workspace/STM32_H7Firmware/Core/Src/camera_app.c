@@ -115,6 +115,25 @@ static void run_cv(camera_app_t *app)
         return;
     }
 
+    /* The reference was stored for one frame size and one ROI. With another
+     * geometry the rows would be misaligned, so discard it instead of
+     * subtracting garbage. */
+    if (app->bg_captured &&
+        ((app->bg_frame_w != w) || (app->bg_frame_h != h) ||
+         (app->bg_roi_en  != (app->cv_cfg.roi_enabled ? 1u : 0u)) ||
+         (app->cv_cfg.roi_enabled &&
+          ((app->bg_roi_x != app->cv_cfg.roi_x) ||
+           (app->bg_roi_y != app->cv_cfg.roi_y) ||
+           (app->bg_roi_w != app->cv_cfg.roi_w) ||
+           (app->bg_roi_h != app->cv_cfg.roi_h))))) {
+        app->bg_captured = 0u;
+        if (app->cv_cfg.bgsub_enabled) {
+            camproto_send_warn(app->uart,
+                "Background does not match frame size/ROI - CV BGCAP again");
+        }
+        camproto_send_cv_config(app);
+    }
+
     const uint8_t *bg = (app->bg_captured &&
                          app->bg_buf != NULL &&
                          app->bg_buf_size >= needed)
@@ -196,6 +215,13 @@ static void handle_cv(camera_app_t *app, char *sub)
             return;
         }
         app->bg_captured = 1u;
+        app->bg_frame_w  = bw;
+        app->bg_frame_h  = bh;
+        app->bg_roi_en   = app->cv_cfg.roi_enabled ? 1u : 0u;
+        app->bg_roi_x    = app->cv_cfg.roi_x;
+        app->bg_roi_y    = app->cv_cfg.roi_y;
+        app->bg_roi_w    = app->cv_cfg.roi_w;
+        app->bg_roi_h    = app->cv_cfg.roi_h;
         camproto_send_cv_config(app);
         camproto_send_info(app->uart, "BGCAP done");
         return;
@@ -778,11 +804,14 @@ void camera_app_task(void *arg)
                     /*
                      * stream_enable is checked only once (above); there is
                      * no wait for a pending STREAM 0.  With the flash LED
-                     * enabled, HAL_Delay(1000) lets it warm up for 1000 ms
-                     * before the snapshot is taken.
+                     * enabled, the task sleeps 1000 ms so the LED can warm up
+                     * before the snapshot is taken.  vTaskDelay instead of
+                     * HAL_Delay: HAL_Delay busy-waits, and CAM_APP (priority 3)
+                     * would keep UART_TX (2) and the heartbeat (1) from
+                     * running for that second.
                      */
                     if (app->flash_enable) {
-                        HAL_Delay(1000);   /* LED warm-up */
+                        vTaskDelay(pdMS_TO_TICKS(1000u));   /* LED warm-up */
                     }
                     camcap_do_snapshot(app);
                     app->flash_enable = 0u;

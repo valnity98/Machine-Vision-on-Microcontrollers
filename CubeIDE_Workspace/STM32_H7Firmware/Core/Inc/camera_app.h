@@ -111,6 +111,12 @@ typedef struct {
     uint8_t  *bg_buf;
     uint32_t  bg_buf_size;
     uint8_t   bg_captured;  /* 1 after CV BGCAP has been executed */
+    /* Geometry the background was captured with. The buffer holds the ROI
+     * crop row by row, so a different frame size or ROI would shift every
+     * row; CV RUN compares these and drops the background if they differ. */
+    uint16_t  bg_frame_w, bg_frame_h;
+    uint8_t   bg_roi_en;
+    uint16_t  bg_roi_x, bg_roi_y, bg_roi_w, bg_roi_h;
 
     QueueHandle_t        rx_q;
     UART_HandleTypeDef  *rx_huart;
