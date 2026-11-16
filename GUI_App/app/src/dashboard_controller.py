@@ -17,10 +17,10 @@ Key design decisions:
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QCheckBox, QComboBox, QMessageBox
+from PySide6.QtWidgets import QMessageBox
 
 from app_constants import (
-    DEFAULT_BAUDRATE, DEFAULT_BAUDRATE_INT,
+    DEFAULT_BAUDRATE_INT,
     JPEG_RESOLUTIONS, RGB_RESOLUTIONS,
 )
 from serial_service import SerialService

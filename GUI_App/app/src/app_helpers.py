@@ -9,7 +9,6 @@ from datetime import datetime
 from pathlib import Path
 
 from PIL import Image
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage
 
 from app_constants import TM_UNCERTAIN_THRESHOLD

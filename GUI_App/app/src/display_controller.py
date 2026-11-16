@@ -38,8 +38,9 @@ class DisplayMixin:
             lbl.setText("")
 
         if self._last_qimg is None or self._last_qimg.isNull():
-            self._w("imageLabel").setText("No frame — connect STM32 and press SNAP")
+            # setPixmap() clears the label, so the text is set after it.
             self._w("imageLabel").setPixmap(QPixmap())
+            self._w("imageLabel").setText("No frame — connect STM32 and press SNAP")
             return
 
         _display("imageLabel",        self._last_qimg)
@@ -161,24 +162,22 @@ class DisplayMixin:
                 lbl.setText(status)
                 lbl.setStyleSheet(f"color: {color}; font-weight: bold;")
 
-        # Gray out / enable CV and TM action buttons based on frame availability
-        cv_ok = has_frame and is_rgb
-        for btn_name in ("btnRunCV", "btnSnapAndRunCV", "cvBtnBgCap"):
+        # Gray out / enable the CV and TM buttons that work on the last frame.
+        rgb_ok = has_frame and is_rgb
+        for btn_name in ("btnRunCV", "cvBtnBgCap", "btnRunML"):
             btn = self.window.findChild(object, btn_name)
             if btn:
-                btn.setEnabled(cv_ok and self._stm32_ready)
-                if not cv_ok:
-                    btn.setToolTip(
-                        "Requires RGB565 frame — switch to RGB mode and press SNAP")
+                btn.setEnabled(rgb_ok and self._stm32_ready)
+                btn.setToolTip(
+                    "" if rgb_ok else
+                    "Requires RGB565 frame — switch to RGB mode and press SNAP")
 
-        tm_ok = has_frame and is_rgb
-        for btn_name in ("btnRunML", "btnSnapAndRunML"):
+        # The "Snap + Run" buttons capture the RGB frame themselves, so they
+        # only need a ready STM32, not an existing frame.
+        for btn_name in ("btnSnapAndRunCV", "btnSnapAndRunML"):
             btn = self.window.findChild(object, btn_name)
             if btn:
-                btn.setEnabled(tm_ok and self._stm32_ready)
-                if not tm_ok:
-                    btn.setToolTip(
-                        "Requires RGB565 frame — switch to RGB mode and press SNAP")
+                btn.setEnabled(self._stm32_ready)
 
     # ---------------------------------------------------------------- CV display
     def _update_cv_idle_display(self) -> None:
@@ -241,7 +240,7 @@ class DisplayMixin:
             bar  = self.window.findChild(object, f"sc{i}Bar")
             vlbl = self.window.findChild(object, f"sc{i}ValLabel")
             if bar:
-                bar.setValue(int(score * 1000))
+                bar.setValue(round(score * 1000))
                 bar.setProperty("active", "true" if is_top else "false")
                 bar.style().unpolish(bar)
                 bar.style().polish(bar)

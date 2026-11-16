@@ -653,9 +653,9 @@ class ReferenceWindowController(
         self._send(f"CV EN {'1' if checked else '0'}")
 
     def _cv_send_preset(self) -> None:
-        """Apply preset: load preset values into UI widgets locally.
-        Does NOT send to STM32 — user must click CV RUN to apply.
-        This gives instant visual feedback without UART traffic."""
+        """Send the selected preset to the STM32 and load its values into
+        the UI widgets. The STM32 confirms the active configuration with a
+        CVCFG line."""
         combo = self._cv_widget("cvPresetCombo")
         if not combo:
             return
@@ -1104,7 +1104,7 @@ class ReferenceWindowController(
             layout = grp.layout()
             if layout is None:
                 return
-            from PySide6.QtWidgets import QBoxLayout, QGridLayout, QFormLayout
+            from PySide6.QtWidgets import QBoxLayout, QGridLayout
             if isinstance(layout, QBoxLayout):
                 # QVBoxLayout / QHBoxLayout — insert at top
                 layout.insertWidget(0, lbl)

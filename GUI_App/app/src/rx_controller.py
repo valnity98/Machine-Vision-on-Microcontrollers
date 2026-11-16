@@ -258,6 +258,9 @@ class RxMixin:
 
         if line.startswith("TMINFO:"):
             status, ram, flash = parse_tminfo(line)
+            # TMINFO is only sent at boot and on "TM GET", not with every
+            # result. Keep it, so that each new TmResult can carry it.
+            self._tm_info = (status, ram, flash)
             if self._tm_pending is None:
                 self._tm_pending = TmResult()
             self._tm_pending.runtime_status = status
@@ -278,6 +281,11 @@ class RxMixin:
                 is_uncertain      = is_unc,
                 inference_time_ms = t_ms,
             )
+            tm_info = getattr(self, "_tm_info", None)
+            if tm_info is not None:
+                (self._tm_pending.runtime_status,
+                 self._tm_pending.ram_kb,
+                 self._tm_pending.flash_kb) = tm_info
             return
 
         if line.startswith("TMPROB:"):
