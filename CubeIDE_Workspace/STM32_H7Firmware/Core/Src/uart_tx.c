@@ -78,8 +78,17 @@ BaseType_t uart_tx_send_text(uart_tx_t *u, const char *s)
 
     memset(&job, 0, sizeof(job));
     job.type = UART_JOB_TEXT;
-    n        = strnlen(s, UART_TX_TEXT_MAX - 1u);
-    memcpy(job.text, s, n);
+    n        = strnlen(s, UART_TX_TEXT_MAX);
+    if (n >= UART_TX_TEXT_MAX) {
+        /* Too long for one slot: cut it, but keep the line terminated so the
+         * host does not glue it to the next line. */
+        n = UART_TX_TEXT_MAX - 3u;
+        memcpy(job.text, s, n);
+        job.text[n++] = '\r';
+        job.text[n++] = '\n';
+    } else {
+        memcpy(job.text, s, n);
+    }
     job.text[n] = '\0';
     job.len     = (uint32_t)n;
 

@@ -22,9 +22,12 @@
 extern "C" {
 #endif
 
-/* Maximum text payload (including NUL) stored inside one queue job. */
+/* Maximum text payload (including NUL) stored inside one queue job.
+ * The longest protocol line is CVCFG: about 190..220 characters with realistic
+ * values, 239 with every field at its maximum (see camproto_send_cv_config).
+ * 256 leaves room for that; every queue slot costs this much heap. */
 #ifndef UART_TX_TEXT_MAX
-#define UART_TX_TEXT_MAX      192u
+#define UART_TX_TEXT_MAX      256u
 #endif
 
 /* Maximum bytes per single DMA transfer (16-bit HAL length limit). */
