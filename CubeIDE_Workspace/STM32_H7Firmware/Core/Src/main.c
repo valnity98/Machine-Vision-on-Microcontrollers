@@ -16,7 +16,8 @@
 *                                             cvBinBuffer  (127.5 KB)
 *  RAM_D2   0x30000000  288 KB  .cvtmb_buf    cvTmpBuffer  (127.5 KB)
 *                               .cvbg_buf     cvBgBuffer   (127.5 KB)
-*  RAM_D3   0x38000000   64 KB  .tinyml_buf   g_activations (41 152 B = 40.2 KB)
+*  DTCM     0x20000000  128 KB  .tinyml_buf   g_activations (41 152 B = 40.2 KB)
+*  RAM_D3   0x38000000   64 KB  (not used by the application)
 *
 * ── Buffer sizing rationale ──────────────────────────────────────────────────
 *
@@ -35,8 +36,12 @@
 * ── MPU configuration ────────────────────────────────────────────────────────
 *  Region 0: 0x00000000 / 4 GB     — No-access background region
 *  Region 1: RAM_D1 0x24000000 / 512 KB — Non-Cacheable (TEX=1 C=0 B=0)
-*  Region 2: RAM_D2 0x30000000 / 256 KB — Non-Cacheable (same attributes)
-*  Region 3: RAM_D3 0x38000000 /  64 KB — Non-Cacheable (same attributes)
+*  Region 2: RAM_D2 0x30000000 / 256 KB — Non-Cacheable (TEX=1 C=0 B=0). The two
+*            buffers (255 KB) have to fit into these 256 KB. Do not make this region
+*            cacheable without a test on the board: when it was tried (write-back),
+*            the TinyML result became constant, the cause was not found.
+*  Region 3: RAM_D3 0x38000000 /  64 KB — Non-Cacheable (TEX=1 C=0 B=0)
+*  DTCM (0x20000000) needs no MPU region: it is not cached and not DMA-capable.
 *
 * ── ROI note ─────────────────────────────────────────────────────────────────
 *  If a fixed ROI is always active the CV buffers could be sized for that ROI
@@ -143,9 +148,9 @@
  *   At 480×272: 261 120 + 130 560 = 391 680 B (383 KB) ≤ 512 KB ✅
  *
  * RAM_D2 holds cvTmpBuffer + cvBgBuffer (.cvtmb_buf + .cvbg_buf sections).
- *   At 480×272: 130 560 + 130 560 = 261 120 B (255 KB) ≤ 288 KB ✅
+ *   At 480×272: 130 560 + 130 560 = 261 120 B (255 KB) ≤ 256 KB (MPU region 2) ✅
  *
- * RAM_D3 holds g_activations (.tinyml_buf); the linker enforces the 64 KB
+ * DTCM holds g_activations (.tinyml_buf); the linker enforces the 128 KB
  * limit directly — no compile-time approximation needed here. */
 
 #define _RAM_D1_BUF_SIZE  (FRAME_BUF_SIZE + CV_BIN_BUF_SIZE)
@@ -154,8 +159,8 @@ _Static_assert(_RAM_D1_BUF_SIZE <= (512u * 1024u),
     "Reduce APP_RGB_MAX_WIDTH/HEIGHT or APP_CV_MAX_WIDTH/HEIGHT.");
 
 #define _RAM_D2_BUF_SIZE  (CV_TMP_BUF_SIZE + CV_BG_BUF_SIZE)
-_Static_assert(_RAM_D2_BUF_SIZE <= (288u * 1024u),
-    "RAM_D2 overflow: cvTmpBuffer + cvBgBuffer exceed 288 KB. "
+_Static_assert(_RAM_D2_BUF_SIZE <= (256u * 1024u),
+    "RAM_D2 overflow: cvTmpBuffer + cvBgBuffer exceed the 256 KB MPU region 2. "
     "Reduce APP_CV_MAX_WIDTH/HEIGHT.");
 
 /* USER CODE END PD */
@@ -815,8 +820,7 @@ void MPU_Config(void)
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
+
   MPU_InitStruct.Number = MPU_REGION_NUMBER3;
   MPU_InitStruct.BaseAddress = 0x38000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_64KB;

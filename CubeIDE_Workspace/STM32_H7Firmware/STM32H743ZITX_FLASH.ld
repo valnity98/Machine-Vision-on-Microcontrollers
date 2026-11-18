@@ -7,11 +7,11 @@
  *
  *  Region    Base         Size    DMA-capable  Used for
  *  ──────────────────────────────────────────────────────────────────────────
- *  DTCMRAM   0x20000000  128 KB  NO  (CPU)    heap, main stack
+ *  DTCMRAM   0x20000000  128 KB  NO  (CPU)    g_activations (TinyML), heap, main stack
  *  RAM_D1    0x24000000  512 KB  YES (DMA2)   .data, .bss, frameBuffer,
  *                                             cvBinBuffer
  *  RAM_D2    0x30000000  288 KB  YES           cvTmpBuffer, cvBgBuffer
- *  RAM_D3    0x38000000   64 KB  YES (BDMA)   g_activations (TinyML)
+ *  RAM_D3    0x38000000   64 KB  YES (BDMA)   not used
  *  ITCMRAM   0x00000000   64 KB  NO           not used
  *
  * ── RAM_D1 budget (480×272 capture) ────────────────────────────────────────
@@ -31,21 +31,24 @@
  *
  *  Both buffers are CPU-only (no DMA on RAM_D2 required by this application).
  *  MPU Region 2 marks RAM_D2 (0x30000000, 256 KB) as Non-Cacheable.
+ *  The two buffers (255 KB) have to stay inside these 256 KB.
  *
- * ── RAM_D3 budget ───────────────────────────────────────────────────────────
+ * ── DTCM budget ─────────────────────────────────────────────────────────────
  *
  *  g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE  (41 152 B, X-CUBE-AI report)  .tinyml_buf
+ *  heap + main stack reserve                          4 096 B
  *  ─────────────────────────────────────────────────────────────────────────
- *  Total                   41 152 B  (~40.2 KB)  of 64 KB   ✅ (~23.8 KB free)
+ *  Total                   45 248 B  (~44.2 KB)  of 128 KB   ✅  (the main stack
+ *  grows down from the top of DTCM)
  *
  *  The 57 876 B in the X-CUBE-AI report are the total RAM of the network
  *  including its runtime (activations 41 152 B + runtime 16 724 B); only the
- *  activations are placed in RAM_D3.
+ *  activations are placed in DTCM.
  *
- *  X-CUBE-AI only requires CPU access; RAM_D3 (SRAM4, D3 domain) is suitable.
- *  IMPORTANT: MPU_Config() in main.c MUST cover RAM_D3 (0x38000000, 64 KB)
- *  as Non-Cacheable (Region 3, TEX=1 C=0 B=0).  Without this the Cortex-M7
- *  D-Cache may serve stale reads from the activation buffer.
+ *  X-CUBE-AI only requires CPU access. DTCM is not cached, so no MPU region
+ *  and no cache maintenance are needed. The same buffer in RAM_D3 (a
+ *  Non-Cacheable MPU region) made an inference 3x slower (157 ms instead of
+ *  53 ms, measured on the board).
  *  g_activations is memset to 0 by tinyml_init() before every
  *  ai_network_create_and_init() call because NOLOAD sections are not zeroed
  *  by startup code.
@@ -53,8 +56,8 @@
  * ── MPU (main.c MPU_Config) ─────────────────────────────────────────────────
  *  Region 0: 0x00000000 / 4 GB     — No-access background region
  *  Region 1: RAM_D1 0x24000000 / 512 KB — Non-Cacheable (TEX=1 C=0 B=0)
- *  Region 2: RAM_D2 0x30000000 / 256 KB — Non-Cacheable (same attributes)
- *  Region 3: RAM_D3 0x38000000 /  64 KB — Non-Cacheable (same attributes)
+ *  Region 2: RAM_D2 0x30000000 / 256 KB — Non-Cacheable (TEX=1 C=0 B=0)
+ *  Region 3: RAM_D3 0x38000000 /  64 KB — Non-Cacheable (TEX=1 C=0 B=0)
  *
  * ── Why cvBinBuffer and cvTmpBuffer cannot be merged or reduced ─────────────
  *
@@ -195,6 +198,25 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM_D1
 
+  /* ── DTCMRAM (0x20000000, 128 KB) — TinyML activation buffer ───────────────
+   *
+   * The Cortex-M7 reaches DTCM in one cycle without the D-cache, and the
+   * activations are only used by the CPU (X-CUBE-AI does not use DMA).
+   * In RAM_D3 (non-cacheable by the MPU) every access goes through the bus.
+   * NOLOAD: not zeroed by startup; tinyml_init() clears g_activations before
+   * every ai_network_create_and_init(). It is placed before the heap/stack
+   * reserve so that the newlib heap starts behind it.
+   */
+  .tinyml_buf (NOLOAD) :
+  {
+    . = ALIGN(32);
+    __tinyml_buf_start__ = .;
+    KEEP(*(.tinyml_buf))
+    KEEP(*(.tinyml_buf*))
+    . = ALIGN(32);
+    __tinyml_buf_end__ = .;
+  } >DTCMRAM
+
   /* ── DTCMRAM: heap + main stack reserve ─────────────────────────────────── */
   ._user_heap_stack :
   {
@@ -260,28 +282,6 @@ SECTIONS
     . = ALIGN(32);
     __cvbg_buf_end__ = .;
   } >RAM_D2
-
-  /* ── RAM_D3 (SRAM4, 0x38000000, 64 KB) — TinyML activation buffer ──────────
-   *
-   * NOLOAD: not zeroed by startup.
-   * IMPORTANT: MPU Region 3 in main.c must mark this region Non-Cacheable
-   * (0x38000000, 64 KB, TEX=1 C=0 B=0).  Without it the Cortex-M7 D-Cache
-   * can serve stale reads from the activation buffer between inference calls.
-   * tinyml_init() calls memset(g_activations, 0, ...) before every
-   * ai_network_create_and_init() to compensate for the missing startup zero.
-   *
-   * g_activations  AI_NETWORK_DATA_ACTIVATIONS_SIZE (41 152 B, X-CUBE-AI report)
-   * RAM_D3 total: 41 152 B (~40.2 KB) of 64 KB  ✅  (~23.8 KB free)
-   */
-  .tinyml_buf (NOLOAD) :
-  {
-    . = ALIGN(32);
-    __tinyml_buf_start__ = .;
-    KEEP(*(.tinyml_buf))
-    KEEP(*(.tinyml_buf*))
-    . = ALIGN(32);
-    __tinyml_buf_end__ = .;
-  } >RAM_D3
 
   /DISCARD/ : { libc.a(*) libm.a(*) libgcc.a(*) }
   .ARM.attributes 0 : { *(.ARM.attributes) }
