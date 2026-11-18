@@ -61,9 +61,9 @@ Frame size that the board delivers (checked on a Nucleo-144 board):
 
 | `RES` | JPEG mode | RGB mode |
 |-------|-----------|----------|
-| `QQVGA` | **176×144** (not 160×120) | 160×120 |
+| `QQVGA` | 160×120 | 160×120 |
 | `QVGA` | 320×240 | 320×240 |
-| `WQVGA` | **320×240** (not 480×272) | 480×272 |
+| `WQVGA` | **320×240** (there is no 480×272 JPEG setting) | 480×272 |
 | `VGA` | 640×480 | refused (`ERR: buffer too small for RGB frame`: 614 KB do not fit into the 255 KB frame buffer); the previous resolution stays |
 | `SVGA` | 800×600 | 320×240 (no RGB setting for it) |
 

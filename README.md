@@ -116,6 +116,7 @@ The "STM32 ready" indicator appears after `OV2640 ready` is received.
   - A background reference was still used after the ROI or the resolution had changed.
   - `MODE` and `RES` reset the sensor, so brightness, contrast, saturation, effect and white balance fell back to the defaults while the dashboard still showed the old values.
   - `RES VGA` in RGB mode left the camera application in a state where every `SNAP` failed.
+  - JPEG `QQVGA` delivered 176×144 instead of 160×120 (wrong zoom registers in the register list).
   - Every manual `SNAP` in RGB mode reset the quality settings of the dashboard.
 
   Two behaviours are documented but not changed: `ZOOM 2|4` only scales the whole field of view down, and `AWB 0` is the sensor's other automatic mode, not "off" (see [docs/uart-protocol.md](docs/uart-protocol.md)). The tests used a build made without CubeMX (GCC 14.2, the generated X-CUBE-AI validation files replaced by empty functions), not a CubeIDE build.
