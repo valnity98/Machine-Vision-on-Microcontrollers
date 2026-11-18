@@ -98,14 +98,14 @@ For a **reproducible CV vs TinyML comparison**:
 5. Repeat for scenes with 0, 1, 2, 3, 4 objects.
 6. **Export CSV** → analyse accuracy, timing, uncertain predictions.
 
-**Measured on the STM32H743 @ 480 MHz** (mean of five consecutive runs per scene, two scenes, `HAL_GetTick()`, 1 ms resolution; firmware built with Arm GNU Toolchain 14.2, `-Os`)
+**Measured on the STM32H743 @ 480 MHz** (mean of five consecutive runs per scene, several scenes, `HAL_GetTick()`, 1 ms resolution; firmware built with Arm GNU Toolchain 14.2, `-Os`)
 
 | Operation | Mean latency |
 |-----------|--------------|
-| CV RUN, Otsu, preset FAST (no filter, no morphology), QVGA | 39 to 55 ms |
+| CV RUN, Otsu, preset FAST (no filter, no morphology), QVGA | 37 to 55 ms |
 | CV RUN, Otsu, preset ROBUST (3×3 box, 3×3 opening), QVGA | 161 to 166 ms |
 | CV RUN, Otsu, preset ACCURATE (5×5 median, 5×5 opening), QVGA | 551 to 704 ms |
-| TM RUN (inference) | 157 ms |
+| TM RUN (inference) | 53 ms |
 
-The spread between the five runs of one scene was at most 1 ms. The CV time depends on the scene (up to 30 % between the two scenes); the TinyML time did not change.
+The spread between the five runs of one scene was at most 1 ms. The CV time depends on the scene (up to 30 %); the TinyML time did not change. The activation buffer of the network is in DTCM; in the non-cacheable RAM_D3 (the previous placement) an inference took 157 ms.
 
