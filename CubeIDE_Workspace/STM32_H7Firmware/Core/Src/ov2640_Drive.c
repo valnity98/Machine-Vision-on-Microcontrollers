@@ -55,6 +55,32 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi)
 }
 
 /* ---------------------------------------------------------------------------
+ * Delays
+ *
+ * The driver is called from CAM_APP (priority 3). HAL_Delay() busy-waits, so
+ * the register lists (one delay per register) kept UART_TX and the heartbeat
+ * from running for the whole RES/MODE change. Inside a task the delay now
+ * sleeps; before the scheduler runs it still falls back to HAL_Delay().
+ * ---------------------------------------------------------------------------*/
+static void ov2640_delay_ms(uint32_t ms)
+{
+    if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+        /* +1 tick: the first tick may be shorter than 1 ms, like HAL_Delay(). */
+        vTaskDelay(pdMS_TO_TICKS(ms) + 1u);
+    } else {
+        HAL_Delay(ms);
+    }
+}
+
+/* Give other tasks the CPU while a capture is polled. */
+static void ov2640_yield(void)
+{
+    if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+        vTaskDelay(1u);
+    }
+}
+
+/* ---------------------------------------------------------------------------
  * Size helpers
  * ---------------------------------------------------------------------------*/
 uint32_t ov2640_rgb565_bytes(uint16_t width, uint16_t height)
@@ -118,7 +144,7 @@ HAL_StatusTypeDef ov2640_apply_reglist(ov2640_t *dev,
         if ((list[i].reg == 0xFFu) && (list[i].val == 0xFFu)) { break; }
         HAL_StatusTypeDef st = ov2640_sccb_write(dev, list[i].reg, list[i].val);
         if (st != HAL_OK) { return st; }
-        if (delay_ms != 0u) { HAL_Delay(delay_ms); }
+        if (delay_ms != 0u) { ov2640_delay_ms(delay_ms); }
     }
     return HAL_OK;
 }
@@ -130,9 +156,9 @@ HAL_StatusTypeDef ov2640_reset_hw(ov2640_t *dev)
 {
     if ((dev == NULL) || (dev->rst_port == NULL)) { return HAL_ERROR; }
     HAL_GPIO_WritePin(dev->rst_port, dev->rst_pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
+    ov2640_delay_ms(10);
     HAL_GPIO_WritePin(dev->rst_port, dev->rst_pin, GPIO_PIN_SET);
-    HAL_Delay(10);
+    ov2640_delay_ms(10);
     return HAL_OK;
 }
 
@@ -155,7 +181,7 @@ HAL_StatusTypeDef ov2640_init(ov2640_t *dev)
     /* Software reset. */
     st = ov2640_sccb_write(dev, OV2640_SENSOR_COM7, 0x80u);
     if (st != HAL_OK) { return st; }
-    HAL_Delay(10);
+    ov2640_delay_ms(10);
 
     return ov2640_dcmi_stop(dev);
 }
@@ -254,7 +280,7 @@ HAL_StatusTypeDef ov2640_set_resolution_rgb(ov2640_t *dev, ov2640_resolution_t r
     if (st != HAL_OK) { return st; }
     st = ov2640_sccb_write(dev, OV2640_SENSOR_COM7, 0x80u);
     if (st != HAL_OK) { return st; }
-    HAL_Delay(10);
+    ov2640_delay_ms(10);
 
     switch (res) {
     case OV2640_RES_QQVGA_160x120: sel = OV2640_160x120_RGB;  break;
@@ -455,6 +481,7 @@ HAL_StatusTypeDef ov2640_capture_snapshot_framedone(ov2640_t *dev,
                 g_active_hdcmi = NULL;
                 return HAL_TIMEOUT;
             }
+            ov2640_yield();
         }
     }
 
