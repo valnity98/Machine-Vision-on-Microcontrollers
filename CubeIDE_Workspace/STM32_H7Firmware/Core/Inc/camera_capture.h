@@ -36,6 +36,9 @@ void camcap_stop_stream_if_active(camera_app_t *app);
 void camcap_apply_resolution_only(camera_app_t *app);
 void camcap_apply_mode_and_res   (camera_app_t *app);
 
+/* Send the stored image-quality settings to the sensor again. */
+void camcap_reapply_quality(camera_app_t *app);
+
 void camcap_do_snapshot(camera_app_t *app);
 
 /* Return 1 and fill w/h when a valid RGB565 frame is available, 0 otherwise. */

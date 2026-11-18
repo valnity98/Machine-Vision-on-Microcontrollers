@@ -830,10 +830,12 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart, "SAT -2|-1|0|+1|+2");
                     break;
                 }
-                if (ov2640_set_saturation(&app->cam, lvl) != HAL_OK)
+                if (ov2640_set_saturation(&app->cam, lvl) != HAL_OK) {
                     camproto_send_err(app->uart, "SAT failed");
-                else
+                } else {
+                    app->q_sat = lvl; app->q_valid |= 0x04u;
                     camproto_send_info(app->uart, "SAT set");
+                }
                 break;
             }
 
@@ -843,10 +845,12 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart, "BRI -2|-1|0|+1|+2");
                     break;
                 }
-                if (ov2640_set_brightness(&app->cam, lvl) != HAL_OK)
+                if (ov2640_set_brightness(&app->cam, lvl) != HAL_OK) {
                     camproto_send_err(app->uart, "BRI failed");
-                else
+                } else {
+                    app->q_bri = lvl; app->q_valid |= 0x01u;
                     camproto_send_info(app->uart, "BRI set");
+                }
                 break;
             }
 
@@ -856,10 +860,12 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart, "CON -2|-1|0|+1|+2");
                     break;
                 }
-                if (ov2640_set_contrast(&app->cam, lvl) != HAL_OK)
+                if (ov2640_set_contrast(&app->cam, lvl) != HAL_OK) {
                     camproto_send_err(app->uart, "CON failed");
-                else
+                } else {
+                    app->q_con = lvl; app->q_valid |= 0x02u;
                     camproto_send_info(app->uart, "CON set");
+                }
                 break;
             }
 
@@ -871,10 +877,12 @@ void camera_app_task(void *arg)
                         "BLUISH|GREENISH|REDDISH|ANTIQUE");
                     break;
                 }
-                if (ov2640_set_effect(&app->cam, e) != HAL_OK)
+                if (ov2640_set_effect(&app->cam, e) != HAL_OK) {
                     camproto_send_err(app->uart, "EFFECT failed");
-                else
+                } else {
+                    app->q_effect = e; app->q_valid |= 0x08u;
                     camproto_send_info(app->uart, "EFFECT set");
+                }
                 break;
             }
 
@@ -885,10 +893,12 @@ void camera_app_task(void *arg)
                         "LIGHT AUTO|SUNNY|CLOUDY|OFFICE|HOME");
                     break;
                 }
-                if (ov2640_set_lightmode(&app->cam, m) != HAL_OK)
+                if (ov2640_set_lightmode(&app->cam, m) != HAL_OK) {
                     camproto_send_err(app->uart, "LIGHT failed");
-                else
+                } else {
+                    app->q_light = m; app->q_valid |= 0x10u; app->q_wb_last = 1u;
                     camproto_send_info(app->uart, "LIGHT set");
+                }
                 break;
             }
 
@@ -897,11 +907,13 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart, "AWB 0|1");
                     break;
                 }
-                if (ov2640_set_awb_simple(&app->cam,
-                        atoi(arg1) ? 1u : 0u) != HAL_OK)
+                uint8_t awb = atoi(arg1) ? 1u : 0u;
+                if (ov2640_set_awb_simple(&app->cam, awb) != HAL_OK) {
                     camproto_send_err(app->uart, "AWB failed");
-                else
+                } else {
+                    app->q_awb = awb; app->q_valid |= 0x20u; app->q_wb_last = 2u;
                     camproto_send_info(app->uart, "AWB set");
+                }
                 break;
             }
 

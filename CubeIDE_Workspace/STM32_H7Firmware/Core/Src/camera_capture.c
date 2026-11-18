@@ -144,6 +144,27 @@ void camcap_stop_stream_if_active(camera_app_t *app)
     camproto_send_info(app->uart, "STREAM auto-stopped for reconfig");
 }
 
+/* ── Image quality ───────────────────────────────────────────────────────── */
+
+/* MODE and RES reset the sensor (COM7 soft reset / register lists), so the
+ * brightness, contrast, saturation, effect and white-balance settings the host
+ * chose earlier would silently fall back to the defaults. Send them again. */
+void camcap_reapply_quality(camera_app_t *app)
+{
+    if ((app == NULL) || (app->q_valid == 0u)) { return; }
+
+    if (app->q_valid & 0x01u) { (void)ov2640_set_brightness(&app->cam, app->q_bri); }
+    if (app->q_valid & 0x02u) { (void)ov2640_set_contrast(&app->cam, app->q_con); }
+    if (app->q_valid & 0x04u) { (void)ov2640_set_saturation(&app->cam, app->q_sat); }
+    if (app->q_valid & 0x08u) { (void)ov2640_set_effect(&app->cam, app->q_effect); }
+    /* LIGHT and AWB both write register 0xC7: apply the one set last. */
+    if ((app->q_valid & 0x10u) && (app->q_wb_last == 1u)) {
+        (void)ov2640_set_lightmode(&app->cam, app->q_light);
+    } else if ((app->q_valid & 0x20u) && (app->q_wb_last == 2u)) {
+        (void)ov2640_set_awb_simple(&app->cam, app->q_awb);
+    }
+}
+
 /* Apply the currently selected resolution without changing pixel format. */
 void camcap_apply_resolution_only(camera_app_t *app)
 {
@@ -154,6 +175,7 @@ void camcap_apply_resolution_only(camera_app_t *app)
         if (ov2640_set_resolution_JPEG(&app->cam, app->res) != HAL_OK) {
             camproto_send_err(app->uart, "set_resolution(JPEG) failed");
         } else {
+            camcap_reapply_quality(app);
             camproto_send_info(app->uart, "RES applied");
         }
         return;
@@ -171,6 +193,7 @@ void camcap_apply_resolution_only(camera_app_t *app)
         camproto_send_err(app->uart, "DCMI JPEG clear failed");
         return;
     }
+    camcap_reapply_quality(app);
     camproto_send_info(app->uart, "RES applied");
 }
 
@@ -189,6 +212,7 @@ void camcap_apply_mode_and_res(camera_app_t *app)
             camproto_send_err(app->uart, "set_resolution(JPEG) failed");
             return;
         }
+        camcap_reapply_quality(app);
         camproto_send_info(app->uart, "MODE=JPEG");
         return;
     }
@@ -205,6 +229,7 @@ void camcap_apply_mode_and_res(camera_app_t *app)
         camproto_send_err(app->uart, "DCMI JPEG clear failed");
         return;
     }
+    camcap_reapply_quality(app);
     camproto_send_info(app->uart, "MODE=RGB");
 }
 

@@ -55,6 +55,8 @@ CVDONE
 | `FLASH 0\|1` | Flash LED on for the following `SNAP`s; the LED is lit for 1 s before the frame is taken |
 | `ZOOM 1\|2\|4` | RGB mode only, see the note below |
 
+`MODE` and `RES` reset the sensor. The firmware sends the last `BRI`, `CON`, `SAT`, `EFFECT`, `LIGHT` and `AWB` values to it again afterwards, so these settings stay in effect (checked on the board with `LIGHT OFFICE`; before this change the sensor fell back to its defaults while the dashboard still showed the old value).
+
 Frame size that the board delivers (checked on a Nucleo-144 board):
 
 | `RES` | JPEG mode | RGB mode |

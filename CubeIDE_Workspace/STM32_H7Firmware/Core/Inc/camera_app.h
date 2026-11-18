@@ -90,6 +90,18 @@ typedef struct {
     uint16_t             zoom_w;       /* 0 = native, else zoomed output width  */
     uint16_t             zoom_h;       /* 0 = native, else zoomed output height */
 
+    /* Last image-quality settings. MODE and RES reset the sensor, which brings
+     * its registers back to the defaults, so camcap_reapply_quality() sends
+     * these again afterwards. q_valid: bit0 BRI, 1 CON, 2 SAT, 3 EFFECT,
+     * 4 LIGHT, 5 AWB. q_wb_last says which of LIGHT (1) and AWB (2) was set
+     * last, because both write DSP register 0xC7. */
+    uint8_t              q_valid;
+    uint8_t              q_wb_last;
+    uint8_t              q_awb;
+    ov2640_level_t       q_bri, q_con, q_sat;
+    ov2640_effect_t      q_effect;
+    ov2640_lightmode_t   q_light;
+
     /* DCMI/DMA frame buffer in RAM_D1 (.dcmi_buf, Non-Cacheable).
      * Size = APP_RGB_MAX_WIDTH * APP_RGB_MAX_HEIGHT * 2 (RGB565, 2 B/px). */
     uint8_t  *frame_buf;
