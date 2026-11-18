@@ -637,7 +637,10 @@ class ReferenceWindowController(
         self._send(f"FLASH {'1' if flash_on else '0'}", log=False)
 
         if mode == "RGB":
-            self._apply_camera_defaults(log=True)
+            # The quality settings the user chose (brightness, contrast,
+            # saturation, effect, AWB) stay in effect for a manual SNAP. Only
+            # the automatic runs (Snap + CV/TinyML, dataset capture) reset
+            # them to the defaults so that their frames are comparable.
             delay_ms = 450 if changed else 250
             self._log("INFO", f"Waiting {delay_ms} ms for RGB sensor to settle")
             self._schedule_snap(delay_ms, "RGB SNAP")

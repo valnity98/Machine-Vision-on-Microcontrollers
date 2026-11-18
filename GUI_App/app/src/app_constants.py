@@ -12,8 +12,9 @@ JPEG_RESOLUTIONS: list[str] = [
     "QQVGA", "QVGA", "WQVGA", "VGA", "SVGA", "XGA", "SXGA",
 ]
 
+# VGA is missing on purpose: 640x480 RGB565 needs 614 KB, the frame buffer has 255 KB.
 RGB_RESOLUTIONS: list[str] = [
-    "QQVGA", "QVGA", "WQVGA", "VGA",
+    "QQVGA", "QVGA", "WQVGA",
 ]
 
 # ---------------------------------------------------------------------------

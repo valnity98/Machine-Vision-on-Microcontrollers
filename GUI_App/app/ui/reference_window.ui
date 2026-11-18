@@ -377,7 +377,7 @@
 
              <item row="5" column="0"><widget class="QLabel" name="awbLabel"><property name="text"><string>AWB</string></property><property name="role" stdset="0"><string>key</string></property></widget></item>
              <item row="5" column="1">
-              <widget class="QComboBox" name="awbComboBox"><property name="toolTip"><string>AWB — sent immediately on change</string></property>
+              <widget class="QComboBox" name="awbComboBox"><property name="toolTip"><string>White balance, sent immediately. ON (1) = simple automatic mode (default). OFF (0) = the sensor's other automatic mode, not off. Fixed gains: Light = SUNNY / CLOUDY / OFFICE / HOME.</string></property>
                <item><property name="text"><string>ON (1)</string></property></item>
                <item><property name="text"><string>OFF (0)</string></property></item>
               </widget>
@@ -1361,7 +1361,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Digital zoom factor (ZOOM command). 1 = off, 2 = 2×, 4 = 4×</string>
+                  <string>ZOOM command, RGB mode only. 2 and 4 shrink the whole image to ½ and ¼ of the size. The field of view stays the same; there is no crop and no magnification.</string>
                  </property>
                  <item>
                   <property name="text">
