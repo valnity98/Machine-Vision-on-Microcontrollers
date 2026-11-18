@@ -64,8 +64,10 @@ Frame size that the board delivers (checked on a Nucleo-144 board):
 | `QQVGA` | **176×144** (not 160×120) | 160×120 |
 | `QVGA` | 320×240 | 320×240 |
 | `WQVGA` | **320×240** (not 480×272) | 480×272 |
-| `VGA` | 640×480 | refused (`ERR: buffer too small for RGB frame`: 614 KB do not fit into the 255 KB frame buffer) |
+| `VGA` | 640×480 | refused (`ERR: buffer too small for RGB frame`: 614 KB do not fit into the 255 KB frame buffer); the previous resolution stays |
 | `SVGA` | 800×600 | 320×240 (no RGB setting for it) |
+
+When `MODE RGB` is sent while a JPEG-only resolution is set, the firmware switches to `QVGA` and reports `INFO: RES set to QVGA (does not fit RGB565)`.
 
 > `AWB 1` (the default) selects the sensor's simple white balance, `AWB 0` its other automatic mode. Neither switches the white balance off; fixed gains come from `LIGHT SUNNY`, `CLOUDY`, `OFFICE` and `HOME`. In a test scene `AWB 1` gave a clear green cast (R/G 0.76, B/G 0.79) and `AWB 0` a neutral balance (R/G 0.95, B/G 0.94). The OV2640 datasheet text for register 0xC7 was not available; the mapping (0x10 simple, 0x00 the other automatic mode, 0x40 off) follows a [Linux driver commit](https://patchwork.linuxtv.org/project/linux-media/patch/20170416173546.4317-4-fschaefer.oss@googlemail.com) and the colours measured on the board.
 >

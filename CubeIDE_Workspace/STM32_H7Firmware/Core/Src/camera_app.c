@@ -676,6 +676,14 @@ void camera_app_task(void *arg)
                 }
                 else if (ascii_equal(arg1, "RGB")) {
                     app->pixfmt = OV2640_PIXFMT_RGB565;
+                    /* A JPEG-only resolution (VGA ... SXGA) has no RGB frame
+                     * that fits the frame buffer: use QVGA instead of leaving
+                     * the application in a mode that cannot take a snapshot. */
+                    if (camcap_current_rgb_bytes(app) > app->frame_buf_size) {
+                        app->res = OV2640_RES_QVGA_320x240;
+                        camproto_send_info(app->uart,
+                            "RES set to QVGA (does not fit RGB565)");
+                    }
                 }
                 else {
                     camproto_send_err(app->uart,
@@ -696,6 +704,15 @@ void camera_app_task(void *arg)
                     camproto_send_err(app->uart,
                         "RES QQVGA|QVGA|WQVGA|VGA|SVGA|XGA|SXGA");
                     break;
+                }
+                if (app->pixfmt == OV2640_PIXFMT_RGB565) {
+                    uint16_t rw = 0u, rh = 0u;
+                    camcap_rgb_dims_from_res(res, &rw, &rh);
+                    if (ov2640_rgb565_bytes(rw, rh) > app->frame_buf_size) {
+                        camproto_send_err(app->uart,
+                            "buffer too small for RGB frame");
+                        break;
+                    }
                 }
                 app->res = res;
                 /* Resolution re-init resets OV2640 DSP registers — clear zoom state. */
