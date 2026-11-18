@@ -4,6 +4,8 @@
 # scripts in "ML training/src" (training, dataset check, TFLite verification).
 #
 # Python 3.10 to 3.12 (TensorFlow 2.16.2 has no wheels for Python 3.13+).
+# Without TensorFlow, the dashboard and the PC-side inference script also run on
+# Python 3.14 (checked with PySide6 6.12, Pillow, numpy 2.x and ai-edge-litert 2.3.0).
 #
 # The ST Model Zoo training workflow has its own requirements file and needs
 # its own environment; see docs/training.md.
