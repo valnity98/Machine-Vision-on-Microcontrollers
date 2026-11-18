@@ -98,12 +98,14 @@ For a **reproducible CV vs TinyML comparison**:
 5. Repeat for scenes with 0, 1, 2, 3, 4 objects.
 6. **Export CSV** → analyse accuracy, timing, uncertain predictions.
 
-**Measured on the STM32H743 @ 480 MHz** (mean of n = 90 runs, `HAL_GetTick()`, 1 ms resolution)
+**Measured on the STM32H743 @ 480 MHz** (mean of five consecutive runs on one scene, `HAL_GetTick()`, 1 ms resolution; firmware built with Arm GNU Toolchain 14.2, `-Os`)
 
 | Operation | Mean latency |
 |-----------|--------------|
-| CV RUN (Otsu, QVGA) | 66.6 ms (± 0.5 ms) |
-| TM RUN (inference) | 59.8 ms (± 0.2 ms) |
+| CV RUN, Otsu, preset FAST (no filter, no morphology), QVGA | 55 ms |
+| CV RUN, Otsu, preset ROBUST (3×3 box, 3×3 opening), QVGA | 161 ms |
+| CV RUN, Otsu, preset ACCURATE (5×5 median, 5×5 opening), QVGA | 551 ms |
+| TM RUN (inference) | 157 ms |
 
-Both run times are nearly constant and independent of the scene. The CV time was measured before the Otsu fix (see the README, *Known limitations*); the fix only changes the 256-step loop over the histogram, so a large change is not expected, but it has not been measured.
+The spread between the five runs was at most 1 ms. The dependence on the scene was not checked.
 

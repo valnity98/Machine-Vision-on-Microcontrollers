@@ -13,14 +13,16 @@ Course project *Mechatronik und Robotik 2* in the M.Sc. Mechatronics and Robotic
 
 ## Results
 
-Both methods were run on the same frames: 90 frames (10 × 0 objects, 20 × each 1–4 objects) in a home environment with changing daylight, a phone torch and directional shadows. Each data point is one `SNAP` → `CV RUN` → `TM RUN` cycle on the same 320×240 RGB565 frame.
+Run times and memory, measured on the board with the firmware after the code review (Nucleo-144 board with STM32H743ZI at 480 MHz, 320×240 RGB565 frame, `HAL_GetTick()` with 1 ms resolution). Each value is the mean of five consecutive runs on one scene; the spread was at most 1 ms. The firmware was built with Arm GNU Toolchain 14.2 (`-Os`).
 
-| | Classical CV (Otsu) | TinyML (MobileNetV1-0.25) |
-|---|---|---|
-| Mean run time on the STM32 (480 MHz) | 66.6 ms | 59.8 ms |
-| Flash / RAM (incl. runtime) | - | ≈ 279 KiB / ≈ 57 KiB |
+| Operation | Time |
+|---|---|
+| Classical CV, Otsu, preset FAST (no filter, no morphology) | 55 ms |
+| Classical CV, Otsu, preset ROBUST (3×3 box filter, 3×3 opening) | 161 ms |
+| Classical CV, Otsu, preset ACCURATE (5×5 median, 5×5 opening) | 551 ms |
+| TinyML inference (MobileNetV1-0.25) | 157 ms |
 
-Both run times are nearly constant and do not depend on the scene.
+TinyML footprint including the runtime: ≈ 279 KiB flash and ≈ 57 KiB RAM. Whether the run times depend on the scene was not checked.
 
 ![CV debug images of a 4-object scene](docs/images/cv_debug_count4.png)
 
@@ -106,8 +108,9 @@ The "STM32 ready" indicator appears after `OV2640 ready` is received.
 
 ## Known limitations
 
-- **Not re-measured after the last code review.** A review found four firmware errors that are fixed in the code now: an overflow in the Otsu score (`cv_otsu_threshold`) plus an off-by-one at the threshold, protocol lines longer than 191 characters (`CVCFG`) that were cut without a line break, a busy-wait of 1 s in `SNAP` that blocked the UART task, and a background reference that was used after the ROI or resolution had changed. The fixes were checked on the PC only (compiled, and the Otsu arithmetic compared with a Python model); they have not been run on the board. The 66.6 ms for the CV pipeline was measured before the Otsu fix and should be measured again.
-- **TinyML accuracy is a rough figure.** 82.4 % on 250 validation images that also selected the checkpoint; the validation curve is noisy (see [docs/training.md](docs/training.md)).
+- **Run times: one scene, one build.** The table in *Results* comes from five runs per setting on a single scene with a GCC build made without CubeMX (see below). A build made in STM32CubeIDE or another scene was not measured.
+- **Checked on the board after the last code review.** Four errors were found in a review and fixed: an overflow in the Otsu score plus an off-by-one at the threshold, protocol lines longer than 191 characters (`CVCFG`) that were cut without a line break, a busy-wait of 1 s in `SNAP` that blocked the UART task, and a background reference that was used after the ROI or resolution had changed. On the board, the old firmware used threshold 254 for a test frame where the corrected code gives 94 (the pixel count matched my Python model of each version), and it cut `CVCFG` after 191 characters. The corrected firmware gave the predicted pixel count, sent the full line and discarded a background after an ROI change. The 1 s warm-up before the flash snapshot was only checked for function (the snapshot completes in about 2 s), not for the UART starvation it removes. These tests used a build made without CubeMX (GCC 14.2, the generated X-CUBE-AI validation files replaced by empty functions), not a CubeIDE build.
+- **TinyML accuracy is a rough figure.** 82.4 % on 250 validation images that also selected the checkpoint; the validation curve is noisy (see [docs/training.md](docs/training.md)). Two very dark test frames (mean grey 3 and 38) were both classified as `count_4` with 99.6 %, so the model does not signal an unusual input.
 
 ## Repository structure
 
