@@ -6,8 +6,8 @@
  *
  * Architecture notes:
  *   - The stream task and the command handler share app->stream_enable.
- *     After uart_tx_send_bin(), the stream task calls ulTaskNotifyTake()
- *     to block until uart_tx_task notifies it via xTaskNotifyGive().
+ *     After uart_tx_send_bin(), the stream task calls ulTaskNotifyTakeIndexed()
+ *     (slot UART_TX_DONE_NOTIFY_INDEX) to block until uart_tx_task notifies it.
  *     This ensures frame_buf is not reclaimed by DCMI DMA before the
  *     UART TX DMA has finished reading it.  STREAM_EV_START/STOP are
  *     event-group bits and are unaffected by ulTaskNotifyTake().
@@ -566,7 +566,7 @@ void camera_stream_task(void *arg)
                      * notification, completely independent of the event-group
                      * bits used for STREAM_EV_START / STREAM_EV_STOP.
                      */
-                    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10000u));
+                    (void)ulTaskNotifyTakeIndexed(UART_TX_DONE_NOTIFY_INDEX, pdTRUE, pdMS_TO_TICKS(10000u));
                     camproto_send_status(app);
                 } else {
                     uint16_t w = 0u, h = 0u;
@@ -581,7 +581,7 @@ void camera_stream_task(void *arg)
                     (void)uart_tx_send_text(app->uart, hdr);
                     (void)uart_tx_send_bin(app->uart, app->frame_buf,
                                            bytes, app->stream_task);
-                    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10000u));
+                    (void)ulTaskNotifyTakeIndexed(UART_TX_DONE_NOTIFY_INDEX, pdTRUE, pdMS_TO_TICKS(10000u));
                     camproto_send_status(app);
                 }
 

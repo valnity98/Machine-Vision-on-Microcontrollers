@@ -169,6 +169,10 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+/* Two notification slots per task: slot 0 is used by the push button and the stream
+ * start, slot 1 (UART_TX_DONE_NOTIFY_INDEX) by "binary transfer finished". With one
+ * slot, a button press during a transfer could end the wait for the transfer. */
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES    2
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */

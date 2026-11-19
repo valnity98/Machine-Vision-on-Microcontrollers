@@ -263,7 +263,7 @@ void camcap_do_snapshot(camera_app_t *app)
         (void)uart_tx_send_text(app->uart, hdr);
         (void)uart_tx_send_bin(app->uart, app->frame_buf + jpeg_off,
                                jpeg_len, app->cmd_task);
-        (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000u));
+        (void)ulTaskNotifyTakeIndexed(UART_TX_DONE_NOTIFY_INDEX, pdTRUE, pdMS_TO_TICKS(5000u));
         camproto_send_info(app->uart, "SNAP JPEG sent");
         camproto_send_status(app);
         return;
@@ -306,7 +306,7 @@ void camcap_do_snapshot(camera_app_t *app)
                  w, h, (unsigned long)bytes);
         (void)uart_tx_send_text(app->uart, hdr);
         (void)uart_tx_send_bin(app->uart, app->frame_buf, bytes, app->cmd_task);
-        (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000u));
+        (void)ulTaskNotifyTakeIndexed(UART_TX_DONE_NOTIFY_INDEX, pdTRUE, pdMS_TO_TICKS(5000u));
         camproto_send_info(app->uart, "SNAP RGB sent");
         camproto_send_status(app);
     }

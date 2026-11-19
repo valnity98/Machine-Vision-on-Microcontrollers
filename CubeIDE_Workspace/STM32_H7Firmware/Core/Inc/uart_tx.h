@@ -30,6 +30,10 @@ extern "C" {
 #define UART_TX_TEXT_MAX      256u
 #endif
 
+/* Notification slot that uart_tx_task uses to report "binary job finished" to
+ * the task that queued it. Slot 0 stays free for other events (push button). */
+#define UART_TX_DONE_NOTIFY_INDEX 1u
+
 /* Maximum bytes per single DMA transfer (16-bit HAL length limit). */
 #ifndef UART_TX_DMA_CHUNK_MAX
 #define UART_TX_DMA_CHUNK_MAX 32768u

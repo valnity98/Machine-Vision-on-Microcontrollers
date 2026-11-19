@@ -104,6 +104,12 @@ BaseType_t uart_tx_send_bin(uart_tx_t *u, uint8_t *data, uint32_t len,
         return pdFALSE;
     }
 
+    /* A notification that arrived after an earlier wait had timed out would
+     * end the next wait at once: discard it before queueing. */
+    if (notify_task == xTaskGetCurrentTaskHandle()) {
+        (void)ulTaskNotifyTakeIndexed(UART_TX_DONE_NOTIFY_INDEX, pdTRUE, 0u);
+    }
+
     memset(&job, 0, sizeof(job));
     job.type        = UART_JOB_BIN;
     job.data        = data;
@@ -151,7 +157,7 @@ void uart_tx_task(void *arg)
 
         /* Always notify the waiting task, even on error, to prevent deadlock. */
         if (job.notify_task != NULL) {
-            xTaskNotifyGive(job.notify_task);
+            xTaskNotifyGiveIndexed(job.notify_task, UART_TX_DONE_NOTIFY_INDEX);
         }
     }
 }
