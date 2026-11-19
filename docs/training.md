@@ -62,6 +62,19 @@ The checked-in `ML training/Model/user_config.yaml` uses `interpolation: nearest
 
 > How to read these numbers: the validation accuracy jumps between epochs by up to 10 points, and 82.8 % is a single-epoch peak. `restore_best_weights: true` restores the weights of that epoch (the Model Zoo log reports 82.8 % for the float model, not the 70.8 % of the last epoch, so the restored weights were evaluated). The same 250 images chose the checkpoint and report the result, so 82.4 % is an optimistic estimate for new frames. All validation accuracies in `train_metrics.csv` are multiples of 1/250 (derived from the CSV; the dataset is not in the repo). The gap to the training accuracy (94.3 %) shows that the model overfits the small dataset.
 
+> **Evaluation on the validation set** (`ML training/src/eval_quantized_numpy.py`, numpy only, 250 images): 82.0 % (the Model Zoo log says 82.4 %). Rows are the true class, columns the predicted one:
+>
+> | true \ predicted | 0 | 1 | 2 | 3 | 4 |
+> |---|---|---|---|---|---|
+> | 0 | 50 | 0 | 0 | 0 | 0 |
+> | 1 | 0 | 45 | 5 | 0 | 0 |
+> | 2 | 0 | 7 | 38 | 5 | 0 |
+> | 3 | 0 | 0 | 5 | 29 | 16 |
+> | 4 | 0 | 0 | 0 | 7 | 43 |
+>
+> On the first 60 training images per class the accuracy is 94.0 %. Variants of the validation images: RGB565 floor expansion as in the firmware 82.0 %, squeezed to 320×240 first 80.4 %, 30 % darker 79.6 %, 30 % brighter 76.0 %. The script is not bit-exact to the TFLite kernels; on six synthetic images it gave the same scores as the real runtime to three decimals.
+> The images show blue screw terminals on a light background. For other scenes (a room, black, uniform or noisy images) the model answers `count_0` or `count_4` with about 99 %, so a count from such an image is meaningless.
+
 > Training on real OV2640 frames captured with the Dataset Capture tool.  
 > Training and firmware use the same preprocessing mode: full-frame stretch (`aspect_ratio: fit`), nearest-neighbour interpolation, RGB. The exact pixel mapping of TensorFlow's nearest resize and of the firmware's integer-floor mapping was not compared.
 
@@ -90,7 +103,7 @@ flowchart LR
 2. Select **split** (`train` / `val`) and **label** (`count_0`…`count_4`).
 3. Click **Capture N frames**. The GUI snaps and saves automatically.
 4. Collect **≥ 100 training** and **≥ 20 validation** images per class (see `ML training/docs/DATASET_GUIDE.md`).
-5. With "Force RGB / QVGA" ticked, the PNGs are 320×240 RGB, identical to the firmware inference input (otherwise JPEG frames are saved).
+5. With "Force RGB / QVGA" ticked, the PNGs are 320×240 RGB (otherwise JPEG frames are saved). The dataset of the deployed model, however, consists of **480×272** PNGs (WQVGA) of blue screw terminals; the firmware stretches every frame to 96×96, so both sizes work, but 480×272 matches the training images. The dashboard's "Snap + TM RUN" therefore captures WQVGA.
 
 ## Quick start: ML training
 

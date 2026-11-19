@@ -1035,8 +1035,8 @@ class ReferenceWindowController(
 
         TinyML preprocessing (tinyml_preprocess.c) down-scales any RGB565
         or GRAY frame to 96×96.  Any captured RGB565 / GRAY frame is valid.
-        QVGA (320×240) is the recommended resolution but WQVGA and VGA
-        also work — they just require more preprocessing time.
+        WQVGA (480×272) matches the training images of the deployed model;
+        QVGA (320×240) and the other sizes also work — they just require more preprocessing time.
         """
         if self._last_qimg is None or self._last_qimg.isNull():
             return False
@@ -1070,13 +1070,14 @@ class ReferenceWindowController(
             return False
         self._tm_run_after_next_rgb_frame = True
         self._w("camModeComboBox").setCurrentText("RGB")
-        self._w("camResComboBox").setCurrentText("QVGA")
+        # 480x272 like the training images of the deployed model.
+        self._w("camResComboBox").setCurrentText("WQVGA")
         self._send("STREAM 0")
         self._update_stream_status(False)
         changed = self._send_camera_config_if_changed(force=False, log=True)
         self._apply_camera_defaults(log=True)
         delay_ms = 500 if changed else 300
-        self._log("INFO", "Snapping RGB565/QVGA for TinyML auto-run")
+        self._log("INFO", "Snapping RGB565/WQVGA for TinyML auto-run")
         ok = self._schedule_snap(delay_ms, "TinyML RGB SNAP")
         if not ok:
             self._tm_run_after_next_rgb_frame = False
