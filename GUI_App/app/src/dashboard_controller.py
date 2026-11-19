@@ -529,6 +529,17 @@ class DashboardMixin:
     def _apply_camera_defaults(self, *, log: bool = False) -> None:
         for cmd in ("AWB 1", "BRI 0", "CON 0", "SAT 0", "EFFECT NORMAL"):
             self._send(cmd, log=log)
+        # Show in the boxes what was just sent, otherwise they keep the old
+        # choice while the camera runs with the defaults.
+        for name, text in (("briComboBox", "0"), ("conComboBox", "0"),
+                           ("satComboBox", "0"), ("effectComboBox", "NORMAL"),
+                           ("awbComboBox", "ON (1)")):
+            w = self.window.findChild(object, name)
+            idx = w.findText(text) if w is not None else -1
+            if idx >= 0:
+                w.blockSignals(True)
+                w.setCurrentIndex(idx)
+                w.blockSignals(False)
 
     # ---------------------------------------------------------------- quality
     def _apply_brightness(self) -> None:
