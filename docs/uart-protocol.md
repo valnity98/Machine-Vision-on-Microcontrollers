@@ -84,6 +84,7 @@ TMDONE
 ```
 
 > `TIME` (in `CVSTAT` and `TMRES`) is the run time in **milliseconds**, printed as a plain integer without a unit suffix (`HAL_GetTick()` difference, 1 ms resolution). Only the `STAT` line has a unit suffix (`LAT=Xms`).
+> `STATUS` in `TMINFO` is `XCUBEAI_READY` after a successful start. The firmware checks the network with two fixed inputs after the initialisation; `XCUBEAI_READY_AFTER_<n>_TRIES` means the check needed `n` attempts, `XCUBEAI_SELFTEST_FAILED` means it never passed and `TM RUN` returns an error.
 > In `TMINFO`, `RAM` is the activation buffer and `FLASH` the network weights, each rounded up to full KiB (41 KiB / 215 KiB for this model); they are not the totals including runtime.
 > `CONF` and `SCORE` are in **permille (0…1000)**. The GUI normalises to 0.0–1.0.  
 > When `UNCERTAIN=1`, `CLASS=UNCERTAIN` and `IDX=-1`; the GUI marks it as uncertain, not a real class.
