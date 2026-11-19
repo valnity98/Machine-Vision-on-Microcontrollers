@@ -235,6 +235,61 @@ static int run_inference(ai_buffer *ai_in, ai_buffer *ai_out, tinyml_result_t *r
 }
 
 /* ---------------------------------------------------------------------------
+ * Self-test of the network
+ *
+ * After some starts of a test build the network answered every frame with the
+ * same vector (27 / 8 / 20 / 40 / 5 %), although its input was correct, and it
+ * stayed that way until the next reset. The cause was not found. The check
+ * runs two fixed inputs through the network right after the initialisation and
+ * compares the class with the one the TFLite model gives on the PC:
+ *   - all pixels (R,G,B) = (200, 60, 60)  ->  count_0, 98 %
+ *   - all pixels zero                     ->  count_4, 99.6 %
+ * If one of them fails, the network is created again (up to three attempts).
+ * If it still fails, no result is delivered and TMINFO reports the status.
+ * ---------------------------------------------------------------------------*/
+
+#define TINYML_SELFTEST_ATTEMPTS 3u
+
+/* Returns 1 when the network gives the expected class for the given input. */
+static int selftest_case(ai_buffer *ai_in, ai_buffer *ai_out,
+                         const uint8_t pixel[3], uint16_t expect_class)
+{
+    uint8_t *in = (uint8_t *)ai_in[0].data;
+
+    for (uint32_t i = 0u; i < TINYML_INPUT_ELEMENTS; i += 3u) {
+        in[i]      = pixel[0];
+        in[i + 1u] = pixel[1];
+        in[i + 2u] = pixel[2];
+    }
+    if (ai_network_run(g_network, ai_in, ai_out) != 1) { return 0; }
+
+    {
+        const float *f = (const float *)ai_out[0].data;
+        uint16_t     best = 0u;
+        for (uint16_t i = 1u; i < TINYML_NUM_CLASSES; ++i) {
+            if (f[i] > f[best]) { best = i; }
+        }
+        return (best == expect_class) && (f[best] > 0.8f);
+    }
+}
+
+static int selftest(void)
+{
+    static const uint8_t red[3]   = { 200u, 60u, 60u };
+    static const uint8_t black[3] = { 0u, 0u, 0u };
+    ai_u16     n_in = 0u, n_out = 0u;
+    ai_buffer *ai_in  = ai_network_inputs_get (g_network, &n_in);
+    ai_buffer *ai_out = ai_network_outputs_get(g_network, &n_out);
+
+    if ((ai_in == NULL) || (n_in < 1u) || (ai_in[0].data == NULL) ||
+        (ai_out == NULL) || (n_out < 1u) || (ai_out[0].data == NULL)) {
+        return 0;
+    }
+    return selftest_case(ai_in, ai_out, red,   0u) &&
+           selftest_case(ai_in, ai_out, black, 4u);
+}
+
+/* ---------------------------------------------------------------------------
  * Public API
  * ---------------------------------------------------------------------------*/
 
@@ -279,31 +334,51 @@ int tinyml_init(tinyml_config_t *cfg, tinyml_result_t *res)
         return -1;
     }
 
-    /* Destroy any previously initialised network handle. */
-    if (g_network != AI_HANDLE_NULL) {
-        (void)ai_network_destroy(g_network);
-        g_network = AI_HANDLE_NULL;
-    }
-
-    /* Pass weights=NULL: ai_network_data_params_get() sets the Flash pointer
-     * internally.  A non-NULL pointer overrides it with a wrapper address,
-     * corrupting inference. */
-    err = ai_network_create_and_init(&g_network, activations, NULL);
-    if (err.type != AI_ERROR_NONE) {
-        if (res != NULL) {
-            snprintf(res->runtime_status, sizeof(res->runtime_status),
-                     "XCUBEAI_INIT_FAILED");
+    for (uint32_t attempt = 1u; attempt <= TINYML_SELFTEST_ATTEMPTS; ++attempt) {
+        /* Destroy any previously initialised network handle. */
+        if (g_network != AI_HANDLE_NULL) {
+            (void)ai_network_destroy(g_network);
+            g_network = AI_HANDLE_NULL;
         }
-        snprintf(cfg->model_name, sizeof(cfg->model_name),
-                 "%s_INIT_ERR", TINYML_MODEL_NAME);
-        g_network = AI_HANDLE_NULL;
-        return -1;
+        memset(g_activations, 0, sizeof(g_activations));
+
+        /* Pass weights=NULL: ai_network_data_params_get() sets the Flash pointer
+         * internally.  A non-NULL pointer overrides it with a wrapper address,
+         * corrupting inference. */
+        err = ai_network_create_and_init(&g_network, activations, NULL);
+        if (err.type != AI_ERROR_NONE) {
+            if (res != NULL) {
+                snprintf(res->runtime_status, sizeof(res->runtime_status),
+                         "XCUBEAI_INIT_FAILED");
+            }
+            snprintf(cfg->model_name, sizeof(cfg->model_name),
+                     "%s_INIT_ERR", TINYML_MODEL_NAME);
+            g_network = AI_HANDLE_NULL;
+            return -1;
+        }
+
+        if (selftest()) {
+            if (res != NULL) {
+                if (attempt == 1u) {
+                    snprintf(res->runtime_status, sizeof(res->runtime_status),
+                             "XCUBEAI_READY");
+                } else {
+                    snprintf(res->runtime_status, sizeof(res->runtime_status),
+                             "XCUBEAI_READY_AFTER_%lu_TRIES", (unsigned long)attempt);
+                }
+            }
+            return 0;
+        }
     }
 
+    /* The network does not give the expected answers: deliver no results. */
+    (void)ai_network_destroy(g_network);
+    g_network = AI_HANDLE_NULL;
     if (res != NULL) {
-        snprintf(res->runtime_status, sizeof(res->runtime_status), "XCUBEAI_READY");
+        snprintf(res->runtime_status, sizeof(res->runtime_status),
+                 "XCUBEAI_SELFTEST_FAILED");
     }
-    return 0;
+    return -1;
 }
 
 /* Run preprocessing and inference on one RGB565 frame.
