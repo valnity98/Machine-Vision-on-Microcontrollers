@@ -1,0 +1,21 @@
+Copyright (c) 2026 Mutasem Bader (https://github.com/valnity98)
+All Rights Reserved.
+
+This source code is the exclusive property of Mutasem Bader.
+Viewing this code is permitted, but the following are strictly prohibited:
+
+- Using, copying, or distributing this code in whole or in part
+- Submitting this code as your own work (e.g. in academic contexts)
+- Modifying and redistributing under a different name or identity
+- Commercial use of any kind
+
+This project was created for educational/university purposes.
+Any violation of these terms may constitute academic misconduct
+or copyright infringement.
+
+Third-party code:
+This repository also contains code that is not the work of the copyright
+holder above and that stays under its own license: the STM32 HAL and CMSIS
+files, FreeRTOS, the X-CUBE-AI runtime and the generated network files, and the
+OV2640 driver and register lists, which were adapted from code found on the
+Internet. See THIRD-PARTY-NOTICES.md. For all other code, the terms above apply.

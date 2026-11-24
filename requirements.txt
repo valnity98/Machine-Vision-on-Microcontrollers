@@ -1,0 +1,18 @@
+# Python packages for the dashboard (GUI_App) and the evaluation script
+# (ml_training/src). Works on Python 3.10 and newer; the dashboard and the
+# script were tried with Python 3.14, PySide6 6.12, Pillow and numpy 2.x.
+#
+# Training uses the ST Model Zoo, which has its own requirements and needs
+# its own environment (see docs/training.md).
+#
+#   python -m venv .venv
+#   .venv\Scripts\activate          (Windows)
+#   source .venv/bin/activate       (Linux, macOS)
+#   pip install -r requirements.txt
+
+PySide6>=6.6.0      # Qt widgets and QtSerialPort
+Pillow>=10.3.0
+numpy>=1.24
+
+# ml_training/src/evaluate.py also needs ai-edge-litert (or TensorFlow):
+#   pip install ai-edge-litert
