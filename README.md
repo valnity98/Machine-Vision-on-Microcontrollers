@@ -2,7 +2,7 @@
 
 The firmware of a camera system on an STM32H743 that counts up to four objects in an image. The same frame is evaluated in two ways, both on the microcontroller itself: with classical image processing (threshold, morphology, connected components) and with a small quantised neural network (MobileNetV1-0.25, deployed with X-CUBE-AI). The firmware is the main part of this repository. A PC dashboard, which was built with the help of an AI assistant, sends the commands, shows the results and the timing, and records images for the training dataset.
 
-Course project in the M.Sc. Mechatronics and Robotics at Frankfurt UAS (module *Mechatronik und Robotik 2*).
+Course project in the M.Sc. Mechatronics and Robotics at Frankfurt UAS.
 
 ![Test setup: Nucleo-144 board with the OV2640 camera on jumper wires, blue screw terminals as test objects](docs/images/test_setup.jpg)
 
